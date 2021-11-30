@@ -21,9 +21,6 @@ author:
   country: United States of America
   email: chuck.lever@oracle.com
 
-normative:
-  I-D.ietf-nfsv4-rpc-tls:
-
 --- abstract
 
 Recent innovations in Remote Procedure Call transport layer security
@@ -78,10 +75,10 @@ Mutual peer authentication and encryption provided at the transport
 layer is known to make the use of AUTH_NONE and AUTH_SYS more secure.
 
 An RPC service might want to indicate to its clients that it will not
-allow access via AUTH_NONE or AUTH_SYS unless encryption or peer
-authentication is in place. To do that, this document requests the
-allocation of new RPC auth flavors that upper layers,
-such as NFS {{?RFC1813}}, can use to enforce stronger security.
+allow access via AUTH_NONE or AUTH_SYS unless such underlying encryption
+or peer authentication services are in place. To do that, this document
+requests the allocation of new RPC auth flavors that upper layers
+such as NFS {{?RFC8881}} can use to enforce stronger security.
 
 # Requirements Language
 
@@ -110,7 +107,7 @@ and out of scope for this document.
 ## Network File System version 3
 
 NFSv3 clients query which RPC auth flavors a server requires
-using the MNT procedure, defined in {{Appendix I of RFC1813}}
+using the MNT procedure, defined in {{Appendix I of ?RFC1813}}
 as part of the MOUNT RPC program.
 
 To require NFSv3 clients to employ underlying transport security
@@ -192,7 +189,6 @@ The fields in the new entries are assigned as follows:
 |   AUTH_NONE_MA    |  NONE_MA    |  TBD  | AUTH_NONE with mutual peer authentication | RFC_TBD |
 |   AUTH_NONE_ENC   |  NONE_ENC   |  TBD  | AUTH_NONE with transport layer encryption | RFC_TBD |
 |  AUTH_NONE_MA_ENC | NONE_MA_ENC |  TBD  | AUTH_NONE with peer authentication and encryption | RFC_TBD |
-{: rules="groups"}
 
 Please allocate the numeric values from the range 400000-409999.
 
@@ -205,7 +201,6 @@ The fields in the new entries are assigned as follows:
 |   AUTH_SYS_MA     |  SYS_MA     |  TBD  | AUTH_SYS with mutual peer authentication | RFC_TBD |
 |   AUTH_SYS_ENC    |  SYS_ENC    |  TBD  | AUTH_SYS with transport layer encryption | RFC_TBD |
 |  AUTH_SYS_MA_ENC  | SYS_MA_ENC  |  TBD  | AUTH_SYS with peer authentication and encryption | RFC_TBD |
-{: rules="groups"}
 
 Please allocate the numeric values from the range 410000-419999.
 
