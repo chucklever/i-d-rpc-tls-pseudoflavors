@@ -2,7 +2,7 @@
 
 title: New Pseudoflavors for Remote Procedure Calls with Transport Layer Security
 abbrev: RPC TLS Pseudoflavors
-docname: draft-cel-nfsv4-rpc-tls-pseudoflavors
+docname: draft-cel-nfsv4-rpc-tls-pseudoflavors-latest
 category: std
 ipr: trust200902
 area: Transport
@@ -33,7 +33,7 @@ These security mechanisms can protect peers who continue to use
 RPC_AUTH_SYS, which is not cryptographically secure, on open networks.
 This document introduces several new RPC auth pseudo-flavors,
 which an RPC service can use to indicate to their clients
-that the use of encryption and mutual peer authentication 
+that the use of encryption and mutual peer authentication
 is required to access that service.
 
 --- note_Note
@@ -113,9 +113,9 @@ NFSv3 clients query which RPC auth flavors a server requires
 using the MNT procedure, defined in {{Appendix I of RFC1813}}
 as part of the MOUNT RPC program.
 
-To require NFSv3 clients to employ underlying transport security 
+To require NFSv3 clients to employ underlying transport security
 when using AUTH_NONE or AUTH_SYS, the NFS server includes one or
-more of the new RPC auth pseudo-flavors defined in {{iana-cons}} 
+more of the new RPC auth pseudo-flavors defined in {{iana-cons}}
 in the auth_flavors list that is part of a MNT response.
 
 Once the peers have inspected their endpoint configurations to
@@ -130,9 +130,9 @@ NFSv4 clients query which RPC auth flavors a server requires
 using the SECINFO or SECINFO_NO_NAME procedures,
 as defined in {{?RFC8881}}.
 
-To require NFSv4 clients to employ underlying transport security 
+To require NFSv4 clients to employ underlying transport security
 when using AUTH_NONE or AUTH_SYS, the NFS server includes one or
-more of the new RPC auth pseudo-flavors defined in {{iana-cons}} 
+more of the new RPC auth pseudo-flavors defined in {{iana-cons}}
 in the SECINFO4resok list that is part of a SECINFO or
 SECINFO_NO_NAME response.
 
