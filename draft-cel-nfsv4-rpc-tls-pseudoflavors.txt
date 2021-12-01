@@ -1,0 +1,333 @@
+
+
+
+
+Network File System Version 4                                   C. Lever
+Internet-Draft                                                    Oracle
+Intended status: Standards Track                         1 December 2021
+Expires: 4 June 2022
+
+
+   New Pseudoflavors for Remote Procedure Calls with Transport Layer
+                                Security
+              draft-cel-nfsv4-rpc-tls-pseudoflavors-latest
+
+Abstract
+
+   Recent innovations in Remote Procedure Call transport layer security
+   enable broad deployment of encryption and mutual peer authentication
+   when exchanging RPC messages.  These security mechanisms can protect
+   peers who continue to use RPC_AUTH_SYS, which is not
+   cryptographically secure, on open networks.  This document introduces
+   several new RPC auth pseudo-flavors, which an RPC service can use to
+   indicate to their clients that the use of encryption and mutual peer
+   authentication is required to access that service.
+
+Note
+
+   This note is to be removed before publishing as an RFC.
+
+   Discussion of this draft occurs on the NFSv4 working group mailing
+   list (nfsv4@ietf.org), archived at
+   https://mailarchive.ietf.org/arch/browse/nfsv4/. Working Group
+   information is available at https://datatracker.ietf.org/wg/nfsv4/
+   about/.
+
+   Submit suggestions and changes as pull requests at
+   https://github.com/chucklever/i-d-rpc-tls-pseudoflavors.
+   Instructions are on that page.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 4 June 2022.
+
+Copyright Notice
+
+   Copyright (c) 2021 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Requirements Language
+   3.  Example Usage
+     3.1.  Network File System version 3
+     3.2.  Network File System version 4
+   4.  Implementation Status
+   5.  Security Considerations
+   6.  IANA Considerations
+     6.1.  New RPC Auth Flavors
+     6.2.  Pseudoflavors for Secure AUTH_NONE
+     6.3.  Pseudoflavors for Secure AUTH_SYS
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   Each ONC RPC transaction may be associated with a user and a set of
+   groups.  The transaction's RPC auth flavor determines how the user/
+   groups are identified and whether they are authenticated.
+
+   The peers which host applications and RPC services may also be
+   identified and authenicated in each transaction, depending on the RPC
+   auth flavor.
+
+   Not all flavors provide peer and user identification and
+   authentication.  For example, the traditional RPC auth flavor
+   AUTH_NONE identifies no user or group and no authentication or users
+   or peers.
+
+   The traditional RPC auth flavor AUTH_SYS, as it is defined in
+   [RFC5531], provides identification of peers, users and groups, but no
+   authentication of any of these.
+
+   Moreover, unlike some GSS security services, these RPC auth flavors
+   provide no confidentiality or integrity checking.  Therefore
+   AUTH_NONE and AUTH_SYS are considered insecure.
+
+   Mutual peer authentication and encryption provided at the transport
+   layer is known to make the use of AUTH_NONE and AUTH_SYS more secure.
+
+   An RPC service might want to indicate to its clients that it will not
+   allow access via AUTH_NONE or AUTH_SYS unless such underlying
+   encryption or peer authentication services are in place.  To do that,
+   this document requests the allocation of new RPC auth flavors that
+   upper layers such as NFS [RFC8881] can use to enforce stronger
+   security.
+
+2.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Example Usage
+
+   This document defines new protocol elements that any RPC consumer can
+   employ.  This section presents examples of how commonly-used RPC
+   consumers might make use of these new pseudo-flavors.
+
+   Certain aspects of transport layer security are not new.  A
+   deployment might choose to run NFS on a virtual private network
+   established via an ssh tunnel or over IPsec.  The RPCSEC GSS v2
+   specification [RFC5403] recognized the use of security provided by
+   transport services underlying RPC with the introduction of channel
+   binding.
+
+   TLS defines a channel binding [RFC5929] that RPC consumers can use to
+   determine whether appropriate security is in place.  To determine
+   whether an underlying transport security service such as IPsec is in
+   place, an implementation employs APIs that are appropriate for that
+   and out of scope for this document.
+
+3.1.  Network File System version 3
+
+   NFSv3 clients query which RPC auth flavors a server requires using
+   the MNT procedure, defined in Appendix I of [RFC1813] as part of the
+   MOUNT RPC program.
+
+   To require NFSv3 clients to employ underlying transport security when
+   using AUTH_NONE or AUTH_SYS, the NFS server includes one or more of
+   the new RPC auth pseudo-flavors defined in Section 6 in the
+   auth_flavors list that is part of a MNT response.
+
+   Once the peers have inspected their endpoint configurations to ensure
+   that any required peer authentication has been done and encryption
+   has been put into place, they can exchange RPC transactions using the
+   traditional AUTH_SYS or AUTH_NONE flavors in each RPC.
+
+3.2.  Network File System version 4
+
+   NFSv4 clients query which RPC auth flavors a server requires using
+   the SECINFO or SECINFO_NO_NAME procedures, as defined in [RFC8881].
+
+   To require NFSv4 clients to employ underlying transport security when
+   using AUTH_NONE or AUTH_SYS, the NFS server includes one or more of
+   the new RPC auth pseudo-flavors defined in Section 6 in the
+   SECINFO4resok list that is part of a SECINFO or SECINFO_NO_NAME
+   response.
+
+   Once the peers have inspected their endpoint configurations to ensure
+   that any required peer authentication has been done and encryption
+   has been put into place, they can exchange RPC transactions using the
+   traditional AUTH_SYS or AUTH_NONE flavors in each RPC.
+
+4.  Implementation Status
+
+   This section is to be removed before publishing this document as an
+   RFC.
+
+   This section records the status of known implementations of the
+   protocol defined by this specification at the time of posting of this
+   Internet-Draft, and is based on a proposal described in [RFC7942].
+   The description of implementations in this section is intended to
+   assist the IETF in its decision processes in progressing drafts to
+   RFCs.
+
+   Please note that the listing of any individual implementation here
+   does not imply endorsement by the IETF.  Furthermore, no effort has
+   been spent to verify the information presented here that was supplied
+   by IETF contributors.  This is not intended as, and must not be
+   construed to be, a catalog of available implementations or their
+   features.  Readers are advised to note that other implementations may
+   exist.
+
+   There are currently no known implementations of the new RPC pseudo-
+   flavors requested by this document.
+
+5.  Security Considerations
+
+   To be expanded once the proposed set of IANA requests is finalized.
+
+6.  IANA Considerations
+
+   RFC Editor: In the following subsections, please replace RFC-TBD with
+   the RFC number assigned to this document.  Furthermore, please remove
+   this Editor's Note before this document is published.
+
+6.1.  New RPC Auth Flavors
+
+   Following Appendix B of [RFC5531], this document requests several new
+   entries in the RPC Authentication Flavor Numbers
+   (https://www.iana.org/assignments/rpc-authentication-numbers/rpc-
+   authentication-numbers.xhtml) registry.  The purpose of these new
+   flavors is to indicate the use of transport layer encryption or
+   mutual peer authentication with insecure RPC auth flavors.  All new
+   flavors described in the sections below are pseudo-flavors.
+
+6.2.  Pseudoflavors for Secure AUTH_NONE
+
+   The fields in the new entries are assigned as follows:
+
+   +==================+=============+=====+================+===========+
+   |Identifier String | Flavor Name |Value|  Description   | Reference |
+   +==================+=============+=====+================+===========+
+   |AUTH_NONE_MA      |   NONE_MA   | TBD | AUTH_NONE with |   RFC_TBD |
+   |                  |             |     |  mutual peer   |           |
+   |                  |             |     | authentication |           |
+   +------------------+-------------+-----+----------------+-----------+
+   |AUTH_NONE_ENC     |   NONE_ENC  | TBD | AUTH_NONE with |   RFC_TBD |
+   |                  |             |     |transport layer |           |
+   |                  |             |     |   encryption   |           |
+   +------------------+-------------+-----+----------------+-----------+
+   |AUTH_NONE_MA_ENC  | NONE_MA_ENC | TBD | AUTH_NONE with |   RFC_TBD |
+   |                  |             |     |      peer      |           |
+   |                  |             |     | authentication |           |
+   |                  |             |     | and encryption |           |
+   +------------------+-------------+-----+----------------+-----------+
+
+                                  Table 1
+
+   Please allocate the numeric values from the range 400000-409999.
+
+6.3.  Pseudoflavors for Secure AUTH_SYS
+
+   The fields in the new entries are assigned as follows:
+
+   +=================+============+=======+================+===========+
+   |Identifier String|Flavor Name | Value |  Description   | Reference |
+   +=================+============+=======+================+===========+
+   |AUTH_SYS_MA      |   SYS_MA   |  TBD  | AUTH_SYS with  |   RFC_TBD |
+   |                 |            |       |  mutual peer   |           |
+   |                 |            |       | authentication |           |
+   +-----------------+------------+-------+----------------+-----------+
+   |AUTH_SYS_ENC     |  SYS_ENC   |  TBD  | AUTH_SYS with  |   RFC_TBD |
+   |                 |            |       |transport layer |           |
+   |                 |            |       |   encryption   |           |
+   +-----------------+------------+-------+----------------+-----------+
+   |AUTH_SYS_MA_ENC  | SYS_MA_ENC |  TBD  | AUTH_SYS with  |   RFC_TBD |
+   |                 |            |       |      peer      |           |
+   |                 |            |       | authentication |           |
+   |                 |            |       | and encryption |           |
+   +-----------------+------------+-------+----------------+-----------+
+
+                                  Table 2
+
+   Please allocate the numeric values from the range 410000-419999.
+
+7.  References
+
+7.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC5531]  Thurlow, R., "RPC: Remote Procedure Call Protocol
+              Specification Version 2", RFC 5531, DOI 10.17487/RFC5531,
+              May 2009, <https://www.rfc-editor.org/rfc/rfc5531>.
+
+   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+              Code: The Implementation Status Section", BCP 205,
+              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+              <https://www.rfc-editor.org/rfc/rfc7942>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+7.2.  Informative References
+
+   [RFC1813]  Callaghan, B., Pawlowski, B., and P. Staubach, "NFS
+              Version 3 Protocol Specification", RFC 1813,
+              DOI 10.17487/RFC1813, June 1995,
+              <https://www.rfc-editor.org/rfc/rfc1813>.
+
+   [RFC5403]  Eisler, M., "RPCSEC_GSS Version 2", RFC 5403,
+              DOI 10.17487/RFC5403, February 2009,
+              <https://www.rfc-editor.org/rfc/rfc5403>.
+
+   [RFC5929]  Altman, J., Williams, N., and L. Zhu, "Channel Bindings
+              for TLS", RFC 5929, DOI 10.17487/RFC5929, July 2010,
+              <https://www.rfc-editor.org/rfc/rfc5929>.
+
+   [RFC8881]  Noveck, D., Ed. and C. Lever, "Network File System (NFS)
+              Version 4 Minor Version 1 Protocol", RFC 8881,
+              DOI 10.17487/RFC8881, August 2020,
+              <https://www.rfc-editor.org/rfc/rfc8881>.
+
+Acknowledgments
+
+   The editor is grateful to Bill Baker, Rick Macklem, Greg Marsden, and
+   Martin Thomson for their input and support.
+
+   Special thanks to Transport Area Directors Martin Duke and
+   Zaheduzzaman Sarker, NFSV4 Working Group Chairs David Noveck and
+   Brian Pawlowski, and NFSV4 Working Group Secretary Thomas Haynes for
+   their guidance and oversight.
+
+Author's Address
+
+   Charles Lever
+   Oracle Corporation
+   United States of America
+
+   Email: chuck.lever@oracle.com
