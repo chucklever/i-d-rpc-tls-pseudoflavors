@@ -233,9 +233,19 @@ encryption has been put into place, they can exchange RPC
 transactions using the traditional AUTH_SYS or AUTH_NONE flavors
 in each RPC.
 
+### NFSv4 State Protection
+
+{:aside}
+> It might also be possible to employ channel binding so that
+  an NFSv4 server can use transport layer authentication to
+  identify the only client that may modify a particular NFSv4
+  lease. Either we can provide that detail here, or it might
+  need to be specified in an NFSv4-specific document.
+
 # Implementation Status
 
-This section is to be removed before publishing this document as an RFC.
+{:aside}
+> This section is to be removed before publishing this document as an RFC.
 
 This section records the status of known implementations of the
 protocol defined by this specification at the time of posting of this
@@ -268,9 +278,10 @@ To be further expanded once the proposed set of IANA requests is finalized.
 
 # IANA Considerations  {#iana-cons}
 
-RFC Editor: In the following subsections, please replace RFC-TBD with
-the RFC number assigned to this document. Furthermore, please remove
-this Editor's Note before this document is published.
+{:aside}
+> RFC Editor: In the following subsections, please replace RFC-TBD with
+  the RFC number assigned to this document. Furthermore, please remove
+  this Editor's Note before this document is published.
 
 ## New RPC Auth Flavors
 
