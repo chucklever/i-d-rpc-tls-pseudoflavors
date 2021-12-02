@@ -1,7 +1,7 @@
 ---
 
-title: New Pseudoflavors for Remote Procedure Calls with Transport Layer Security
-abbrev: RPC TLS Pseudoflavors
+title: Pseudo-flavors for Remote Procedure Calls with Transport Layer Security
+abbrev: RPC TLS Pseudo-flavors
 docname: draft-cel-nfsv4-rpc-tls-pseudoflavors-latest
 category: std
 ipr: trust200902
@@ -292,7 +292,7 @@ The purpose of these new flavors is to indicate the use of transport
 layer encryption or mutual peer authentication with insecure RPC auth flavors.
 All new flavors described in the sections below are pseudo-flavors.
 
-## Pseudoflavors for Secure AUTH_NONE
+## Pseudo-flavors for Secure AUTH_NONE
 
 The fields in the new entries are assigned as follows:
 
@@ -304,7 +304,7 @@ The fields in the new entries are assigned as follows:
 
 Please allocate the numeric values from the range 400000-409999.
 
-## Pseudoflavors for Secure AUTH_SYS
+## Pseudo-flavors for Secure AUTH_SYS
 
 The fields in the new entries are assigned as follows:
 
