@@ -23,7 +23,6 @@ author:
 
 normative:
   I-D.ietf-nfsv4-rpc-tls:
-  I-D.ietf-kitten-tls-channel-bindings-for-tls13:
 
 --- abstract
 
@@ -82,7 +81,7 @@ allow access via AUTH_NONE or AUTH_SYS unless such underlying encryption
 or peer authentication services are in place. To do that, this document
 requests the allocation of new RPC auth flavors that upper layers
 such as NFS {{?RFC8881}} can use to enforce stronger security when
-unauthenticating RPC auth flavors are in use.
+unauthenticated RPC auth flavors are in use.
 
 The author expects that,
 in addition to RPC-with-TLS as defined in {{I-D.ietf-nfsv4-rpc-tls}},
@@ -143,7 +142,7 @@ of MSG_DENIED, a reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.
 {:aside}
 > Or a specific auth_stat for this case can be allocated.
 
-# TLS Channel Binding
+# Channel Binding
 
 Certain aspects of transport layer security are not new.
 A deployment might choose to run NFS on a virtual private network
@@ -166,22 +165,34 @@ done during a TLS handshake on a transport service that handles RPC traffic
 can be recognized and used by RPC consumers for securely authenticating
 the communicating RPC peers.
 
+{{Section 7 of RFC5929}} identifies a set of API characteristics that
+RPC and its underlying transport provide to RPC consumers.
+
+## TLS Channel Binding
+
 TLS defines several channel binding types {{!RFC5929}} that RPC consumers
 can use to determine whether appropriate security is available and in place
 to protect RPC transactions that continue to use insecure RPC auth flavors
 such as AUTH_SYS.
 
-Further, since RPC-with-TLS requires the use of TLS v1.3 {{?RFC8446}},
-the discussion in {{I-D.ietf-kitten-tls-channel-bindings-for-tls13}}
-is controlling.
+When used with a Certificate handshake message,
+the 'tls-server-end-point' channel binding type
+as defined in {{Section 4 of RFC5929}}
+serves as authentication for securing pseudo-flavors that require
+mutual peer authentication.
 
-{:aside}
-> Insert text here describing which binding type to use and explaining
-> how to use it.
+The RPC-with-TLS specification requires the use of TLS session encryption,
+so the presence of TLS under an RPC transport is enough to secure
+pseudo-flavors that require encryption.
 
-{:aside}
-> If we cannot find an existing channel binding that behaves as we need,
-> one or more new channel binding types can be defined by this document.
+## SSHv2 Channel Binding
+
+When RPC traverses an SSHv2 tunnel established between an RPC server
+and an RPC client,
+the 'tls-unique' channel binding type
+as defined in {{Section 3 of RFC5929}}
+can be used to authenticate peer endpoints and
+provide appropriate confidentiality.
 
 # NFS Examples
 
