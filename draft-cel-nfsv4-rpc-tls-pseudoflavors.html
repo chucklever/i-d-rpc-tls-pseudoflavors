@@ -1022,7 +1022,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Lever</td>
-<td class="center">Expires 4 June 2022</td>
+<td class="center">Expires 5 June 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1035,12 +1035,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-cel-nfsv4-rpc-tls-pseudoflavors-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-12-01" class="published">1 December 2021</time>
+<time datetime="2021-12-02" class="published">2 December 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-06-04">4 June 2022</time></dd>
+<dd class="expires"><time datetime="2022-06-05">5 June 2022</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1095,7 +1095,7 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 June 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 June 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1134,7 +1134,15 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
             <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-new-rpc-auth-pseudo-flavors" class="xref">New RPC Auth Pseudo-Flavors</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-tls-channel-binding" class="xref">TLS Channel Binding</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-channel-binding" class="xref">Channel Binding</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>.  <a href="#name-tls-channel-binding" class="xref">TLS Channel Binding</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-sshv2-channel-binding" class="xref">SSHv2 Channel Binding</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-nfs-examples" class="xref">NFS Examples</a></p>
@@ -1215,7 +1223,7 @@ allow access via AUTH_NONE or AUTH_SYS unless such underlying encryption
 or peer authentication services are in place. To do that, this document
 requests the allocation of new RPC auth flavors that upper layers
 such as NFS <span>[<a href="#RFC8881" class="xref">RFC8881</a>]</span> can use to enforce stronger security when
-unauthenticating RPC auth flavors are in use.<a href="#section-1-7" class="pilcrow">¶</a></p>
+unauthenticated RPC auth flavors are in use.<a href="#section-1-7" class="pilcrow">¶</a></p>
 <p id="section-1-8">The author expects that,
 in addition to RPC-with-TLS as defined in <span>[<a href="#I-D.ietf-nfsv4-rpc-tls" class="xref">I-D.ietf-nfsv4-rpc-tls</a>]</span>,
 other novel RPC transports will eventually appear that also
@@ -1287,10 +1295,10 @@ of MSG_DENIED, a reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.<a hr
 </aside>
 </section>
 </div>
-<div id="tls-channel-binding">
+<div id="channel-binding">
 <section id="section-4">
-      <h2 id="name-tls-channel-binding">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-tls-channel-binding" class="section-name selfRef">TLS Channel Binding</a>
+      <h2 id="name-channel-binding">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-channel-binding" class="section-name selfRef">Channel Binding</a>
       </h2>
 <p id="section-4-1">Certain aspects of transport layer security are not new.
 A deployment might choose to run NFS on a virtual private network
@@ -1314,21 +1322,40 @@ performance benefits.<a href="#section-4-2.1.1" class="pilcrow">¶</a></p>
 done during a TLS handshake on a transport service that handles RPC traffic
 can be recognized and used by RPC consumers for securely authenticating
 the communicating RPC peers.<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">TLS defines several channel binding types <span>[<a href="#RFC5929" class="xref">RFC5929</a>]</span> that RPC consumers
+<p id="section-4-4"><span><a href="https://rfc-editor.org/rfc/rfc5929#section-7" class="relref">Section 7</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span> identifies a set of API characteristics that
+RPC and its underlying transport provide to RPC consumers.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<div id="tls-channel-binding">
+<section id="section-4.1">
+        <h3 id="name-tls-channel-binding">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-tls-channel-binding" class="section-name selfRef">TLS Channel Binding</a>
+        </h3>
+<p id="section-4.1-1">TLS defines several channel binding types <span>[<a href="#RFC5929" class="xref">RFC5929</a>]</span> that RPC consumers
 can use to determine whether appropriate security is available and in place
 to protect RPC transactions that continue to use insecure RPC auth flavors
-such as AUTH_SYS.<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">Further, since RPC-with-TLS requires the use of TLS v1.3 <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>,
-the discussion in <span>[<a href="#I-D.ietf-kitten-tls-channel-bindings-for-tls13" class="xref">I-D.ietf-kitten-tls-channel-bindings-for-tls13</a>]</span>
-is controlling.<a href="#section-4-5" class="pilcrow">¶</a></p>
-<aside id="section-4-6">
-        <p id="section-4-6.1">Insert text here describing which binding type to use and explaining
-how to use it.<a href="#section-4-6.1" class="pilcrow">¶</a></p>
-</aside>
-<aside id="section-4-7">
-        <p id="section-4-7.1">If we cannot find an existing channel binding that behaves as we need,
-one or more new channel binding types can be defined by this document.<a href="#section-4-7.1" class="pilcrow">¶</a></p>
-</aside>
+such as AUTH_SYS.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">When used with a Certificate handshake message,
+the 'tls-server-end-point' channel binding type
+as defined in <span><a href="https://rfc-editor.org/rfc/rfc5929#section-4" class="relref">Section 4</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span>
+serves as authentication for securing pseudo-flavors that require
+mutual peer authentication.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">The RPC-with-TLS specification requires the use of TLS session encryption,
+so the presence of TLS under an RPC transport is enough to secure
+pseudo-flavors that require encryption.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sshv2-channel-binding">
+<section id="section-4.2">
+        <h3 id="name-sshv2-channel-binding">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-sshv2-channel-binding" class="section-name selfRef">SSHv2 Channel Binding</a>
+        </h3>
+<p id="section-4.2-1">When RPC traverses an SSHv2 tunnel established between an RPC server
+and an RPC client,
+the 'tls-unique' channel binding type
+as defined in <span><a href="https://rfc-editor.org/rfc/rfc5929#section-3" class="relref">Section 3</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span>
+can be used to authenticate peer endpoints and
+provide appropriate confidentiality.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="nfs-examples">
@@ -1533,10 +1560,6 @@ All new flavors described in the sections below are pseudo-flavors.<a href="#sec
 <a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
-<dt id="I-D.ietf-kitten-tls-channel-bindings-for-tls13">[I-D.ietf-kitten-tls-channel-bindings-for-tls13]</dt>
-        <dd>
-<span class="refAuthor">Whited, S.</span>, <span class="refTitle">"Channel Bindings for TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-kitten-tls-channel-bindings-for-tls13-12</span>, <time datetime="2021-10-25" class="refDate">25 October 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-kitten-tls-channel-bindings-for-tls13-12">https://datatracker.ietf.org/doc/html/draft-ietf-kitten-tls-channel-bindings-for-tls13-12</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="I-D.ietf-nfsv4-rpc-tls">[I-D.ietf-nfsv4-rpc-tls]</dt>
         <dd>
 <span class="refAuthor">Myklebust, T.</span> and <span class="refAuthor">C. Lever</span>, <span class="refTitle">"Towards Remote Procedure Call Encryption By Default"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-nfsv4-rpc-tls-11</span>, <time datetime="2020-11-23" class="refDate">23 November 2020</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-nfsv4-rpc-tls-11">https://datatracker.ietf.org/doc/html/draft-ietf-nfsv4-rpc-tls-11</a>&gt;</span>. </dd>
@@ -1579,10 +1602,6 @@ All new flavors described in the sections below are pseudo-flavors.<a href="#sec
 <dt id="RFC5056">[RFC5056]</dt>
         <dd>
 <span class="refAuthor">Williams, N.</span>, <span class="refTitle">"On the Use of Channel Bindings to Secure Channels"</span>, <span class="seriesInfo">RFC 5056</span>, <span class="seriesInfo">DOI 10.17487/RFC5056</span>, <time datetime="2007-11" class="refDate">November 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5056">https://www.rfc-editor.org/rfc/rfc5056</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC8446">[RFC8446]</dt>
-        <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8881">[RFC8881]</dt>
       <dd>
