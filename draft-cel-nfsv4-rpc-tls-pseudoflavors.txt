@@ -8,8 +8,7 @@ Intended status: Standards Track                         2 December 2021
 Expires: 5 June 2022
 
 
-   New Pseudoflavors for Remote Procedure Calls with Transport Layer
-                                Security
+Pseudo-flavors for Remote Procedure Calls with Transport Layer Security
               draft-cel-nfsv4-rpc-tls-pseudoflavors-latest
 
 Abstract
@@ -84,8 +83,8 @@ Table of Contents
    7.  Security Considerations
    8.  IANA Considerations
      8.1.  New RPC Auth Flavors
-     8.2.  Pseudoflavors for Secure AUTH_NONE
-     8.3.  Pseudoflavors for Secure AUTH_SYS
+     8.2.  Pseudo-flavors for Secure AUTH_NONE
+     8.3.  Pseudo-flavors for Secure AUTH_SYS
    9.  References
      9.1.  Normative References
      9.2.  Informative References
@@ -333,7 +332,7 @@ Table of Contents
    mutual peer authentication with insecure RPC auth flavors.  All new
    flavors described in the sections below are pseudo-flavors.
 
-8.2.  Pseudoflavors for Secure AUTH_NONE
+8.2.  Pseudo-flavors for Secure AUTH_NONE
 
    The fields in the new entries are assigned as follows:
 
@@ -358,7 +357,7 @@ Table of Contents
 
    Please allocate the numeric values from the range 400000-409999.
 
-8.3.  Pseudoflavors for Secure AUTH_SYS
+8.3.  Pseudo-flavors for Secure AUTH_SYS
 
    The fields in the new entries are assigned as follows:
 
