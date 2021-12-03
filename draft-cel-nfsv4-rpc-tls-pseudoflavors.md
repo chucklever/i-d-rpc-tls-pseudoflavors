@@ -124,10 +124,35 @@ Two prime examples of an insecure flavor are AUTH_NONE and AUTH_SYS.
 
 {::boilerplate bcp14-tagged}
 
-# New RPC Auth Pseudo-Flavors
+# RPC Auth Pseudo-flavors for Transport Layer Security
 
-The distinction between RPC auth flavors and pseudo-flavors is
-described in {{Section 13.4.2 of RFC5531}}.
+{{Section 4 of I-D.ietf-nfsv4-rpc-tls}} introduces a special
+RPC auth flavor known as AUTH_TLS. This RPC auth flavor is
+used only in a NULL procedure that probes the presence of
+support for RPC-with-TLS, and acts as a STARTTLS barrier.
+
+This auth flavor does not carry the identity of the peer
+or a user. RPC clients do not use this RPC auth flavor
+to authenticate users in RPC Calls for non-NULL RPC procedures.
+
+Once transport layer security has been established between
+two RPC peers, an RPC client can use insecure flavors
+when forming RPC Calls
+with knowledge that the RPC server is known and trusted, and
+without concern that the communication can be altered or monitored.
+
+In some cases an RPC server might want to restrict access to
+only RPC clients that have authenticated, or only when
+encryption protects communication. The pseudo-flavors defined
+below enable RPC servers to indicate and enforce access
+restrictions of this type.
+
+## Definitions of New Pseudo-flavors
+
+Using the RPC auth flavor registry instantiated in {{RFC5531}}
+gives us leeway to introduce a narrow basic set of pseudoflavors
+in this document and then expand them, via additional documents,
+as needs arise.
 
 This document specifies several new RPC auth pseudo-flavors
 that servers may advertise to clients and that clients may use
@@ -168,6 +193,9 @@ and the underlying transport does not provide the required additional
 security services as indicated above, the RPC server MUST reject the RPC
 Call and respond with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
 and an auth_stat of AUTH_TOOWEAK.
+
+These pseudo-flavors can be used with any network transport service
+that provides cryptographically secure authentication or encyrption.
 
 # Channel Binding
 
