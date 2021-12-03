@@ -90,6 +90,36 @@ provide transport layer security features.
 These transports can benefit from the pseudo-flavors
 defined in this document.
 
+## Terminology
+
+This document adopts the terminology introduced in Section 3 of
+{{?RFC6973}} and assumes a working knowledge of the Remote Procedure
+Call (RPC) version 2 protocol {{RFC5531}} and the Transport Layer
+Security (TLS) protocol {{RFC8446}}.
+
+This document adheres to the convention that a "client" is a network
+host that actively initiates an association, and a "server" is a
+network host that passively accepts an association request.
+
+An "RPC auth flavor" is a set of protocol elements that can identify
+a peer and a user, and possibly authenticate either or both. The
+distinction between RPC auth flavors and pseudo-flavors is
+discussed in {{Section 13.4.2 of RFC5531}}.
+
+RPC documentation historically refers to the authentication of a
+connecting host as "machine authentication" or "host authentication".
+TLS documentation refers to the same as "peer authentication".
+The current document uses only "peer authentication".
+
+The term "user authentication" in the current document refers
+specifically to the RPC caller's credential provided in the "cred"
+and "verf" fields in each RPC Call.
+
+This document uses the term "insecure RPC auth flavor"
+(or "insecure flavor" for short) to refer to a class of
+RPC auth flavors which provide no user or peer authentication.
+Two prime examples of an insecure flavor are AUTH_NONE and AUTH_SYS.
+
 # Requirements Language
 
 {::boilerplate bcp14-tagged}
