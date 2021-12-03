@@ -249,12 +249,51 @@ in each RPC.
 
 ### NFSv4 State Protection
 
+Note: This section updates RFC 8881.
+
 {:aside}
-> It might also be possible to employ channel binding so that
-  an NFSv4 server can use transport layer authentication to
-  identify the only client that may modify a particular NFSv4
-  lease. Either we can provide that detail here, or it might
-  need to be specified in an NFSv4-specific document.
+> An alternate approach might place the updates described in
+  this section in rfc5661bis.
+
+{{Section 2.4.3 of !RFC8881}} introduces how a server authorizes
+a client to create a new lease or replace a previous one. This
+mechanism prevents clients for maliciously or unintentionally
+wiping open and lock state for another client. Section 2.10.8.3
+of that document further specifies how the server responds to
+unauthorized state changes.
+
+When used with a Certificate handshake message,
+the 'tls-server-end-point' channel binding type
+as defined in {{Section 4 of RFC5929}}
+can provide protection similar to SP4_MACH_CRED.
+
+The text of the first bullet in {{Section 2.4.3 of !RFC8881}}
+is modified to include AUTH_NONE_MPA_ENC or AUTH_SYS_MPA_ENC,
+as follows:
+
+* The principal that created the client ID for the client owner
+  is the same as the principal that is sending the EXCHANGE_ID
+  operation. Note that if the client ID was created with
+  SP4_MACH_CRED state protection (Section 18.35), either:
+
+  - The principal MUST be based on RPCSEC_GSS authentication,
+    the RPCSEC_GSS service used MUST be integrity or privacy,
+    and the same GSS mechanism and principal MUST be used as
+    that used when the client ID was created. Or,
+
+  - The principal MUST be based on AUTH_SYS_MPA_ENC, and
+    the server MUST use channel binding to verify the identity
+    of the client peer when performing any of the operations
+    specified in the spa_mach_ops bitmaps. Or,
+
+  - The principal MUST be based on AUTH_NONE_MPA_ENC, and
+    the server MUST use channel binding to verify the identity
+    of the client peer when performing any of the operations
+    specified in the spa_mach_ops bitmaps.
+
+Subsequent discussion of SP4_MACH_CRED in {{RFC8881}} in
+Sections 2.10.5.1, 2.10.8.3, and 2.10.11.3 would need similar
+additions.
 
 # Implementation Status
 
