@@ -104,39 +104,39 @@ that servers may advertise to clients and that clients may use
 in individual RPC transactions, as follows:
 
 * The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the client
-may use the AUTH_NONE RPC auth flavor in RPC transactions only
-if both endpoints have mutually authenticated. Encryption of
+may present an AUTH_NONE credential and verifier in RPC Calls only
+if both peers have mutually authenticated. Encryption of
 traffic between these peers is not required.
 
 * The new RPC auth pseudo-flavor AUTH_NONE_ENC indicates that the client
-may use the AUTH_NONE RPC auth flavor in RPC transactions only
-if traffic between these peers is encrypted. Mutual authentication
+may present an AUTH_NONE credential and verifier in RPC Calls only
+if traffic between these peers is encrypted. Mutual peer authentication
 is not required.
 
 * The new RPC auth pseudo-flavor AUTH_NONE_MPA_ENC indicates that the client
-may use the AUTH_NONE RPC auth flavor in RPC transactions only
-if both endpoints have mutually authenticated and traffic between
+may present an AUTH_NONE credential and verifier in RPC Calls only
+if both peers have mutually authenticated and traffic between
 these peers is encrypted.
 
 * The new RPC auth pseudo-flavor AUTH_SYS_MPA indicates that the client
-may use the AUTH_SYS RPC auth flavor in RPC transactions only
-if both endpoints have mutually authenticated. Encryption of
+may present an AUTH_SYS credential and verifier in RPC Calls only
+if both peers have mutually authenticated. Encryption of
 traffic between these peers is not required.
 
 * The new RPC auth pseudo-flavor AUTH_SYS_ENC indicates that the client
-may use the AUTH_SYS RPC auth flavor in RPC transactions only
-if traffic between these peers is encrypted. Mutual authentication
+may present an AUTH_SYS credential and verifier in RPC Calls only
+if traffic between these peers is encrypted. Mutual peer authentication
 is not required.
 
 * The new RPC auth pseudo-flavor AUTH_SYS_MPA_ENC indicates that the client
-may use the AUTH_SYS RPC auth flavor in RPC transactions only
-if both endpoints have mutually authenticated and traffic between
+may present an AUTH_SYS credential and verifier in RPC Calls only
+if both peers have mutually authenticated and traffic between
 these peers is encrypted.
 
-If an RPC client sends an RPC transaction using one of these pseudo-flavors
+If an RPC client sends an RPC Call using one of these pseudo-flavors
 and the underlying transport does not provide the required additional
 security services as indicated above, the RPC server MUST reject the RPC
-Call and reply with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
+Call and respond with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
 and an auth_stat of AUTH_TOOWEAK.
 
 # Channel Binding
