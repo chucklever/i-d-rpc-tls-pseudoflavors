@@ -1022,7 +1022,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Lever</td>
-<td class="center">Expires 5 June 2022</td>
+<td class="center">Expires 6 June 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1035,12 +1035,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-cel-nfsv4-rpc-tls-pseudoflavors-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-12-02" class="published">2 December 2021</time>
+<time datetime="2021-12-03" class="published">3 December 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-06-05">5 June 2022</time></dd>
+<dd class="expires"><time datetime="2022-06-06">6 June 2022</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1095,7 +1095,7 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 5 June 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 June 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1141,6 +1141,9 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
                 <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-sshv2-channel-binding" class="xref">SSHv2 Channel Binding</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="xref">4.3</a>.  <a href="#name-channel-binding-for-rdma-tr" class="xref">Channel Binding for RDMA Transports</a></p>
 </li>
             </ul>
 </li>
@@ -1255,9 +1258,9 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       </h2>
 <p id="section-3-1">The distinction between RPC auth flavors and pseudo-flavors is
 described in <span><a href="https://rfc-editor.org/rfc/rfc5531#section-13.4.2" class="relref">Section 13.4.2</a> of [<a href="#RFC5531" class="xref">RFC5531</a>]</span>.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">This document requests allocation of several RPC auth pseudo-flavors
-that servers may advertise to clients but are not used in individual
-RPC transactions, as follows:<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-2">This document specifies several new RPC auth pseudo-flavors
+that servers may advertise to clients and that clients may use
+in individual RPC transactions, as follows:<a href="#section-3-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-3.1">The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the client
 may use the AUTH_NONE RPC auth flavor in RPC transactions only
@@ -1290,14 +1293,11 @@ if both endpoints have mutually authenticated and traffic between
 these peers is encrypted.<a href="#section-3-3.6" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-3-4">If an RPC client sends an RPC transaction whose RPC auth flavor is
-either AUTH_NONE or AUTH_SYS and the underlying transport does not
-provide the required additional security services as indicated above,
-the RPC server <span class="bcp14">MUST</span> reject the RPC Call and reply with a reply_stat
-of MSG_DENIED, a reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.<a href="#section-3-4" class="pilcrow">¶</a></p>
-<aside id="section-3-5">
-        <p id="section-3-5.1">Or a specific auth_stat for this case can be allocated.<a href="#section-3-5.1" class="pilcrow">¶</a></p>
-</aside>
+<p id="section-3-4">If an RPC client sends an RPC transaction using one of these pseudo-flavors
+and the underlying transport does not provide the required additional
+security services as indicated above, the RPC server <span class="bcp14">MUST</span> reject the RPC
+Call and reply with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
+and an auth_stat of AUTH_TOOWEAK.<a href="#section-3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="channel-binding">
@@ -1324,7 +1324,8 @@ performance benefits.<a href="#section-4-2.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-4-3">We are particularly interested in ensuring that the mutual authentication
-done during a TLS handshake on a transport service that handles RPC traffic
+done during a TLS handshake (most recently specified in <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>)
+on a transport service that handles RPC traffic
 can be recognized and used by RPC consumers for securely authenticating
 the communicating RPC peers.<a href="#section-4-3" class="pilcrow">¶</a></p>
 <p id="section-4-4"><span><a href="https://rfc-editor.org/rfc/rfc5929#section-7" class="relref">Section 7</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span> identifies a set of API characteristics that
@@ -1334,7 +1335,7 @@ RPC and its underlying transport provide to RPC consumers.<a href="#section-4-4"
         <h3 id="name-tls-channel-binding">
 <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-tls-channel-binding" class="section-name selfRef">TLS Channel Binding</a>
         </h3>
-<p id="section-4.1-1">TLS defines several channel binding types <span>[<a href="#RFC5929" class="xref">RFC5929</a>]</span> that RPC consumers
+<p id="section-4.1-1"><span>[<a href="#RFC5929" class="xref">RFC5929</a>]</span> defines several TLS channel binding types that RPC consumers
 can use to determine whether appropriate security is available and in place
 to protect RPC transactions that continue to use insecure RPC auth flavors
 such as AUTH_SYS.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
@@ -1359,6 +1360,23 @@ the 'tls-unique' channel binding type
 as defined in <span><a href="https://rfc-editor.org/rfc/rfc5929#section-3" class="relref">Section 3</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span>
 can be used to authenticate peer endpoints and
 provide appropriate confidentiality.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="channel-binding-for-rdma-transports">
+<section id="section-4.3">
+        <h3 id="name-channel-binding-for-rdma-tr">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-channel-binding-for-rdma-tr" class="section-name selfRef">Channel Binding for RDMA Transports</a>
+        </h3>
+<p id="section-4.3-1">As of this writing, RPC-over-RDMA <span>[<a href="#RFC8166" class="xref">RFC8166</a>]</span> does not provide a
+transport layer security service. However, <span><a href="https://rfc-editor.org/rfc/rfc5056#section-5" class="relref">Section 5</a> of [<a href="#RFC5056" class="xref">RFC5056</a>]</span>
+suggests a mechanism by which channel binding can protect
+RDDP <span>[<a href="#RFC5040" class="xref">RFC5040</a>]</span>, the protocol that handles
+remote direct data placement for the iWARP family of protocols.
+The transport layer underlying RDDP might use
+IPsec <span>[<a href="#RFC6071" class="xref">RFC6071</a>]</span>,
+TLS <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>,
+or
+Encapsulating Security Payload (ESP) <span>[<a href="#RFC4303" class="xref">RFC4303</a>]</span>.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1410,13 +1428,52 @@ in each RPC.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
           <h4 id="name-nfsv4-state-protection">
 <a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-nfsv4-state-protection" class="section-name selfRef">NFSv4 State Protection</a>
           </h4>
-<aside id="section-5.2.1-1">
-            <p id="section-5.2.1-1.1">It might also be possible to employ channel binding so that
-  an NFSv4 server can use transport layer authentication to
-  identify the only client that may modify a particular NFSv4
-  lease. Either we can provide that detail here, or it might
-  need to be specified in an NFSv4-specific document.<a href="#section-5.2.1-1.1" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-1">Note: This section updates RFC 8881.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+<aside id="section-5.2.1-2">
+            <p id="section-5.2.1-2.1">An alternate approach might place the updates described in
+  this section in rfc5661bis.<a href="#section-5.2.1-2.1" class="pilcrow">¶</a></p>
 </aside>
+<p id="section-5.2.1-3"><span><a href="https://rfc-editor.org/rfc/rfc8881#section-2.4.3" class="relref">Section 2.4.3</a> of [<a href="#RFC8881" class="xref">RFC8881</a>]</span> introduces how a server authorizes
+a client to create a new lease or replace a previous one. This
+mechanism prevents clients for maliciously or unintentionally
+wiping open and lock state for another client. Section 2.10.8.3
+of that document further specifies how the server responds to
+unauthorized state changes.<a href="#section-5.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-4">When used with a Certificate handshake message,
+the 'tls-server-end-point' channel binding type
+as defined in <span><a href="https://rfc-editor.org/rfc/rfc5929#section-4" class="relref">Section 4</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span>
+can provide protection similar to SP4_MACH_CRED.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-5">The text of the first bullet in <span><a href="https://rfc-editor.org/rfc/rfc8881#section-2.4.3" class="relref">Section 2.4.3</a> of [<a href="#RFC8881" class="xref">RFC8881</a>]</span>
+is modified to include AUTH_NONE_MPA_ENC or AUTH_SYS_MPA_ENC,
+as follows:<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.2.1-6.1">
+              <p id="section-5.2.1-6.1.1">The principal that created the client ID for the client owner
+is the same as the principal that is sending the EXCHANGE_ID
+operation. Note that if the client ID was created with
+SP4_MACH_CRED state protection (Section 18.35), either:<a href="#section-5.2.1-6.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.2.1-6.1.2.1">The principal <span class="bcp14">MUST</span> be based on RPCSEC_GSS authentication,
+the RPCSEC_GSS service used <span class="bcp14">MUST</span> be integrity or privacy,
+and the same GSS mechanism and principal <span class="bcp14">MUST</span> be used as
+that used when the client ID was created. Or,<a href="#section-5.2.1-6.1.2.1" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-5.2.1-6.1.2.2">The principal <span class="bcp14">MUST</span> be based on AUTH_SYS_MPA_ENC, and
+the server <span class="bcp14">MUST</span> use channel binding to verify the identity
+of the client peer when performing any of the operations
+specified in the spa_mach_ops bitmaps. Or,<a href="#section-5.2.1-6.1.2.2" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-5.2.1-6.1.2.3">The principal <span class="bcp14">MUST</span> be based on AUTH_NONE_MPA_ENC, and
+the server <span class="bcp14">MUST</span> use channel binding to verify the identity
+of the client peer when performing any of the operations
+specified in the spa_mach_ops bitmaps.<a href="#section-5.2.1-6.1.2.3" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+          </ul>
+<p id="section-5.2.1-7">Subsequent discussion of SP4_MACH_CRED in <span>[<a href="#RFC8881" class="xref">RFC8881</a>]</span> in
+Sections 2.10.5.1, 2.10.8.3, and 2.10.11.3 would need similar
+additions.<a href="#section-5.2.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1604,8 +1661,12 @@ All new flavors described in the sections below are pseudo-flavors.<a href="#sec
 <span class="refAuthor">Sheffer, Y.</span> and <span class="refAuthor">A. Farrel</span>, <span class="refTitle">"Improving Awareness of Running Code: The Implementation Status Section"</span>, <span class="seriesInfo">BCP 205</span>, <span class="seriesInfo">RFC 7942</span>, <span class="seriesInfo">DOI 10.17487/RFC7942</span>, <time datetime="2016-07" class="refDate">July 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7942">https://www.rfc-editor.org/rfc/rfc7942</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8881">[RFC8881]</dt>
+      <dd>
+<span class="refAuthor">Noveck, D., Ed.</span> and <span class="refAuthor">C. Lever</span>, <span class="refTitle">"Network File System (NFS) Version 4 Minor Version 1 Protocol"</span>, <span class="seriesInfo">RFC 8881</span>, <span class="seriesInfo">DOI 10.17487/RFC8881</span>, <time datetime="2020-08" class="refDate">August 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8881">https://www.rfc-editor.org/rfc/rfc8881</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -1622,13 +1683,29 @@ All new flavors described in the sections below are pseudo-flavors.<a href="#sec
         <dd>
 <span class="refAuthor">Linn, J.</span>, <span class="refTitle">"Generic Security Service Application Program Interface Version 2, Update 1"</span>, <span class="seriesInfo">RFC 2743</span>, <span class="seriesInfo">DOI 10.17487/RFC2743</span>, <time datetime="2000-01" class="refDate">January 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2743">https://www.rfc-editor.org/rfc/rfc2743</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC4303">[RFC4303]</dt>
+        <dd>
+<span class="refAuthor">Kent, S.</span>, <span class="refTitle">"IP Encapsulating Security Payload (ESP)"</span>, <span class="seriesInfo">RFC 4303</span>, <span class="seriesInfo">DOI 10.17487/RFC4303</span>, <time datetime="2005-12" class="refDate">December 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4303">https://www.rfc-editor.org/rfc/rfc4303</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5040">[RFC5040]</dt>
+        <dd>
+<span class="refAuthor">Recio, R.</span>, <span class="refAuthor">Metzler, B.</span>, <span class="refAuthor">Culley, P.</span>, <span class="refAuthor">Hilland, J.</span>, and <span class="refAuthor">D. Garcia</span>, <span class="refTitle">"A Remote Direct Memory Access Protocol Specification"</span>, <span class="seriesInfo">RFC 5040</span>, <span class="seriesInfo">DOI 10.17487/RFC5040</span>, <time datetime="2007-10" class="refDate">October 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5040">https://www.rfc-editor.org/rfc/rfc5040</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC5056">[RFC5056]</dt>
         <dd>
 <span class="refAuthor">Williams, N.</span>, <span class="refTitle">"On the Use of Channel Bindings to Secure Channels"</span>, <span class="seriesInfo">RFC 5056</span>, <span class="seriesInfo">DOI 10.17487/RFC5056</span>, <time datetime="2007-11" class="refDate">November 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5056">https://www.rfc-editor.org/rfc/rfc5056</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8881">[RFC8881]</dt>
+<dt id="RFC6071">[RFC6071]</dt>
+        <dd>
+<span class="refAuthor">Frankel, S.</span> and <span class="refAuthor">S. Krishnan</span>, <span class="refTitle">"IP Security (IPsec) and Internet Key Exchange (IKE) Document Roadmap"</span>, <span class="seriesInfo">RFC 6071</span>, <span class="seriesInfo">DOI 10.17487/RFC6071</span>, <time datetime="2011-02" class="refDate">February 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6071">https://www.rfc-editor.org/rfc/rfc6071</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8166">[RFC8166]</dt>
+        <dd>
+<span class="refAuthor">Lever, C., Ed.</span>, <span class="refAuthor">Simpson, W.</span>, and <span class="refAuthor">T. Talpey</span>, <span class="refTitle">"Remote Direct Memory Access Transport for Remote Procedure Call Version 1"</span>, <span class="seriesInfo">RFC 8166</span>, <span class="seriesInfo">DOI 10.17487/RFC8166</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8166">https://www.rfc-editor.org/rfc/rfc8166</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8446">[RFC8446]</dt>
       <dd>
-<span class="refAuthor">Noveck, D., Ed.</span> and <span class="refAuthor">C. Lever</span>, <span class="refTitle">"Network File System (NFS) Version 4 Minor Version 1 Protocol"</span>, <span class="seriesInfo">RFC 8881</span>, <span class="seriesInfo">DOI 10.17487/RFC8881</span>, <time datetime="2020-08" class="refDate">August 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8881">https://www.rfc-editor.org/rfc/rfc8881</a>&gt;</span>. </dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>

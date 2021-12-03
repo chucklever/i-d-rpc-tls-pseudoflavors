@@ -4,8 +4,8 @@
 
 Network File System Version 4                                   C. Lever
 Internet-Draft                                                    Oracle
-Intended status: Standards Track                         2 December 2021
-Expires: 5 June 2022
+Intended status: Standards Track                         3 December 2021
+Expires: 6 June 2022
 
 
 Pseudo-flavors for Remote Procedure Calls with Transport Layer Security
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 June 2022.
+   This Internet-Draft will expire on 6 June 2022.
 
 Copyright Notice
 
@@ -75,6 +75,7 @@ Table of Contents
    4.  Channel Binding
      4.1.  TLS Channel Binding
      4.2.  SSHv2 Channel Binding
+     4.3.  Channel Binding for RDMA Transports
    5.  NFS Examples
      5.1.  Network File System version 3
      5.2.  Network File System version 4
@@ -143,9 +144,9 @@ Table of Contents
    The distinction between RPC auth flavors and pseudo-flavors is
    described in Section 13.4.2 of [RFC5531].
 
-   This document requests allocation of several RPC auth pseudo-flavors
-   that servers may advertise to clients but are not used in individual
-   RPC transactions, as follows:
+   This document specifies several new RPC auth pseudo-flavors that
+   servers may advertise to clients and that clients may use in
+   individual RPC transactions, as follows:
 
    *  The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the
       client may use the AUTH_NONE RPC auth flavor in RPC transactions
@@ -177,14 +178,11 @@ Table of Contents
       only if both endpoints have mutually authenticated and traffic
       between these peers is encrypted.
 
-   If an RPC client sends an RPC transaction whose RPC auth flavor is
-   either AUTH_NONE or AUTH_SYS and the underlying transport does not
-   provide the required additional security services as indicated above,
-   the RPC server MUST reject the RPC Call and reply with a reply_stat
-   of MSG_DENIED, a reject_stat of AUTH_ERR, and an auth_stat of
-   AUTH_TOOWEAK.
-
-      |  Or a specific auth_stat for this case can be allocated.
+   If an RPC client sends an RPC transaction using one of these pseudo-
+   flavors and the underlying transport does not provide the required
+   additional security services as indicated above, the RPC server MUST
+   reject the RPC Call and reply with a reply_stat of MSG_DENIED, a
+   reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.
 
 4.  Channel Binding
 
@@ -205,16 +203,17 @@ Table of Contents
       benefits.
 
    We are particularly interested in ensuring that the mutual
-   authentication done during a TLS handshake on a transport service
-   that handles RPC traffic can be recognized and used by RPC consumers
-   for securely authenticating the communicating RPC peers.
+   authentication done during a TLS handshake (most recently specified
+   in [RFC8446]) on a transport service that handles RPC traffic can be
+   recognized and used by RPC consumers for securely authenticating the
+   communicating RPC peers.
 
    Section 7 of [RFC5929] identifies a set of API characteristics that
    RPC and its underlying transport provide to RPC consumers.
 
 4.1.  TLS Channel Binding
 
-   TLS defines several channel binding types [RFC5929] that RPC
+   [RFC5929] defines several TLS channel binding types that RPC
    consumers can use to determine whether appropriate security is
    available and in place to protect RPC transactions that continue to
    use insecure RPC auth flavors such as AUTH_SYS.
@@ -234,6 +233,16 @@ Table of Contents
    and an RPC client, the 'tls-unique' channel binding type as defined
    in Section 3 of [RFC5929] can be used to authenticate peer endpoints
    and provide appropriate confidentiality.
+
+4.3.  Channel Binding for RDMA Transports
+
+   As of this writing, RPC-over-RDMA [RFC8166] does not provide a
+   transport layer security service.  However, Section 5 of [RFC5056]
+   suggests a mechanism by which channel binding can protect RDDP
+   [RFC5040], the protocol that handles remote direct data placement for
+   the iWARP family of protocols.  The transport layer underlying RDDP
+   might use IPsec [RFC6071], TLS [RFC8446], or Encapsulating Security
+   Payload (ESP) [RFC4303].
 
 5.  NFS Examples
 
@@ -273,11 +282,48 @@ Table of Contents
 
 5.2.1.  NFSv4 State Protection
 
-      |  It might also be possible to employ channel binding so that an
-      |  NFSv4 server can use transport layer authentication to identify
-      |  the only client that may modify a particular NFSv4 lease.
-      |  Either we can provide that detail here, or it might need to be
-      |  specified in an NFSv4-specific document.
+   Note: This section updates RFC 8881.
+
+      |  An alternate approach might place the updates described in this
+      |  section in rfc5661bis.
+
+   Section 2.4.3 of [RFC8881] introduces how a server authorizes a
+   client to create a new lease or replace a previous one.  This
+   mechanism prevents clients for maliciously or unintentionally wiping
+   open and lock state for another client.  Section 2.10.8.3 of that
+   document further specifies how the server responds to unauthorized
+   state changes.
+
+   When used with a Certificate handshake message, the 'tls-server-end-
+   point' channel binding type as defined in Section 4 of [RFC5929] can
+   provide protection similar to SP4_MACH_CRED.
+
+   The text of the first bullet in Section 2.4.3 of [RFC8881] is
+   modified to include AUTH_NONE_MPA_ENC or AUTH_SYS_MPA_ENC, as
+   follows:
+
+   *  The principal that created the client ID for the client owner is
+      the same as the principal that is sending the EXCHANGE_ID
+      operation.  Note that if the client ID was created with
+      SP4_MACH_CRED state protection (Section 18.35), either:
+
+      -  The principal MUST be based on RPCSEC_GSS authentication, the
+         RPCSEC_GSS service used MUST be integrity or privacy, and the
+         same GSS mechanism and principal MUST be used as that used when
+         the client ID was created.  Or,
+
+      -  The principal MUST be based on AUTH_SYS_MPA_ENC, and the server
+         MUST use channel binding to verify the identity of the client
+         peer when performing any of the operations specified in the
+         spa_mach_ops bitmaps.  Or,
+
+      -  The principal MUST be based on AUTH_NONE_MPA_ENC, and the
+         server MUST use channel binding to verify the identity of the
+         client peer when performing any of the operations specified in
+         the spa_mach_ops bitmaps.
+
+   Subsequent discussion of SP4_MACH_CRED in [RFC8881] in Sections
+   2.10.5.1, 2.10.8.3, and 2.10.11.3 would need similar additions.
 
 6.  Implementation Status
 
@@ -415,6 +461,11 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
+   [RFC8881]  Noveck, D., Ed. and C. Lever, "Network File System (NFS)
+              Version 4 Minor Version 1 Protocol", RFC 8881,
+              DOI 10.17487/RFC8881, August 2020,
+              <https://www.rfc-editor.org/rfc/rfc8881>.
+
 9.2.  Informative References
 
    [RFC1813]  Callaghan, B., Pawlowski, B., and P. Staubach, "NFS
@@ -427,14 +478,32 @@ Table of Contents
               DOI 10.17487/RFC2743, January 2000,
               <https://www.rfc-editor.org/rfc/rfc2743>.
 
+   [RFC4303]  Kent, S., "IP Encapsulating Security Payload (ESP)",
+              RFC 4303, DOI 10.17487/RFC4303, December 2005,
+              <https://www.rfc-editor.org/rfc/rfc4303>.
+
+   [RFC5040]  Recio, R., Metzler, B., Culley, P., Hilland, J., and D.
+              Garcia, "A Remote Direct Memory Access Protocol
+              Specification", RFC 5040, DOI 10.17487/RFC5040, October
+              2007, <https://www.rfc-editor.org/rfc/rfc5040>.
+
    [RFC5056]  Williams, N., "On the Use of Channel Bindings to Secure
               Channels", RFC 5056, DOI 10.17487/RFC5056, November 2007,
               <https://www.rfc-editor.org/rfc/rfc5056>.
 
-   [RFC8881]  Noveck, D., Ed. and C. Lever, "Network File System (NFS)
-              Version 4 Minor Version 1 Protocol", RFC 8881,
-              DOI 10.17487/RFC8881, August 2020,
-              <https://www.rfc-editor.org/rfc/rfc8881>.
+   [RFC6071]  Frankel, S. and S. Krishnan, "IP Security (IPsec) and
+              Internet Key Exchange (IKE) Document Roadmap", RFC 6071,
+              DOI 10.17487/RFC6071, February 2011,
+              <https://www.rfc-editor.org/rfc/rfc6071>.
+
+   [RFC8166]  Lever, C., Ed., Simpson, W., and T. Talpey, "Remote Direct
+              Memory Access Transport for Remote Procedure Call Version
+              1", RFC 8166, DOI 10.17487/RFC8166, June 2017,
+              <https://www.rfc-editor.org/rfc/rfc8166>.
+
+   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+              <https://www.rfc-editor.org/rfc/rfc8446>.
 
 Acknowledgments
 
