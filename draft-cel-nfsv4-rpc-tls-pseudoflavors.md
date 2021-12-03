@@ -389,14 +389,31 @@ requested by this document.
 
 # Security Considerations {#security-cons}
 
-A discussion of the shortcomings of the AUTH_SYS RPC auth flavor appear
-in the final paragraph of {{Appendix A of RFC5531}}
+Discussion of shortcomings peculiar to the AUTH_SYS RPC auth flavor
+appears in the final paragraph of {{Appendix A of RFC5531}}
 and in {{Appendix A of I-D.ietf-nfsv4-rpc-tls}}.
 
-Important security considerations related to the use of channel binding are
-discussed throughout {{RFC5056}} and in {{Section 10 of RFC5929}}.
+When implementing or deploying transport layer security to protect
+an upper-level RPC protocol:
 
-To be further expanded once the proposed set of IANA requests is finalized.
+* RPC clients that support transport layer security SHOULD use it
+  whenever possible. Typically the only reason not to is when
+  performance is important and reasonable security can be provided
+  in some other way.
+
+* RPC clients that support transport layer security and have
+  the ability to authenticate SHOULD do so. The only reason not to
+  authenticate is when authentication and encryption can only be
+  enabled together, performance is paramount, and there are other
+  available mechanisms that can provide peer authentication securely.
+
+The pseudo-flavors defined in this document enable RPC servers to indicate
+required levels of security so that RPC clients can make informed and
+autonomous decisions that balance performance and scalability against
+security needs.
+
+Important security considerations specific to the use of channel binding
+are discussed throughout {{RFC5056}} and in {{Section 10 of RFC5929}}.
 
 # IANA Considerations  {#iana-cons}
 
