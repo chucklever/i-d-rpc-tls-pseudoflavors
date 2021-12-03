@@ -161,7 +161,8 @@ as a concept that
 > performance benefits.
 
 We are particularly interested in ensuring that the mutual authentication
-done during a TLS handshake on a transport service that handles RPC traffic
+done during a TLS handshake (most recently specified in {{?RFC8446}})
+on a transport service that handles RPC traffic
 can be recognized and used by RPC consumers for securely authenticating
 the communicating RPC peers.
 
@@ -170,7 +171,7 @@ RPC and its underlying transport provide to RPC consumers.
 
 ## TLS Channel Binding
 
-TLS defines several channel binding types {{!RFC5929}} that RPC consumers
+{{!RFC5929}} defines several TLS channel binding types that RPC consumers
 can use to determine whether appropriate security is available and in place
 to protect RPC transactions that continue to use insecure RPC auth flavors
 such as AUTH_SYS.
@@ -193,6 +194,19 @@ the 'tls-unique' channel binding type
 as defined in {{Section 3 of RFC5929}}
 can be used to authenticate peer endpoints and
 provide appropriate confidentiality.
+
+## Channel Binding for RDMA Transports
+
+As of this writing, RPC-over-RDMA {{?RFC8166}} does not provide a
+transport layer security service. However, {{Section 5 of RFC5056}}
+suggests a mechanism by which channel binding can protect
+RDDP {{?RFC5040}}, the protocol that handles
+remote direct data placement for the iWARP family of protocols.
+The transport layer underlying RDDP might use
+IPsec {{?RFC6071}},
+TLS {{?RFC8446}},
+or
+Encapsulating Security Payload (ESP) {{?RFC4303}}.
 
 # NFS Examples
 
