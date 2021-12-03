@@ -99,9 +99,9 @@ defined in this document.
 The distinction between RPC auth flavors and pseudo-flavors is
 described in {{Section 13.4.2 of RFC5531}}.
 
-This document requests allocation of several RPC auth pseudo-flavors
-that servers may advertise to clients but are not used in individual
-RPC transactions, as follows:
+This document specifies several new RPC auth pseudo-flavors
+that servers may advertise to clients and that clients may use
+in individual RPC transactions, as follows:
 
 * The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the client
 may use the AUTH_NONE RPC auth flavor in RPC transactions only
@@ -133,14 +133,11 @@ may use the AUTH_SYS RPC auth flavor in RPC transactions only
 if both endpoints have mutually authenticated and traffic between
 these peers is encrypted.
 
-If an RPC client sends an RPC transaction whose RPC auth flavor is
-either AUTH_NONE or AUTH_SYS and the underlying transport does not
-provide the required additional security services as indicated above,
-the RPC server MUST reject the RPC Call and reply with a reply_stat
-of MSG_DENIED, a reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.
-
-{:aside}
-> Or a specific auth_stat for this case can be allocated.
+If an RPC client sends an RPC transaction using one of these pseudo-flavors
+and the underlying transport does not provide the required additional
+security services as indicated above, the RPC server MUST reject the RPC
+Call and reply with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
+and an auth_stat of AUTH_TOOWEAK.
 
 # Channel Binding
 
