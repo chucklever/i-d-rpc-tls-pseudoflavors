@@ -237,9 +237,23 @@ as defined in {{Section 4 of RFC5929}}
 serves as authentication for securing pseudo-flavors that require
 mutual peer authentication.
 
-The RPC-with-TLS specification requires the use of TLS session encryption,
-so the presence of TLS under an RPC transport is enough to secure
-pseudo-flavors that require encryption.
+The RPC-with-TLS specification requires the use of peer authentication
+and TLS session encryption, so the presence of TLS under an RPC transport
+is enough to secure pseudo-flavors that require both mutual peer
+authentication and encryption.
+
+Moreover, in the particular case of TLS, when a handshake fails,
+both peers are made aware of the failure reason via the Finished message.
+The failure reason can then be communicated to the RPC consumer and the
+local administrator to enable specific corrective action.
+
+For instance, an RPC server's local security policy might require that
+the RPC client's IP address or hostname match its certificates Subject
+Alt Name (SAN). This is not always possible if the client's IP address
+and hostname are assigned dynamically. When such a server causes a
+handshake failure, the administrators can be made aware that
+the server's SAN policy restricted access, and corrective action
+can then be taken.
 
 ## SSHv2 Channel Binding
 
