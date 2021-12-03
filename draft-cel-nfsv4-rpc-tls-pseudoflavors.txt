@@ -70,8 +70,10 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction
+     1.1.  Terminology
    2.  Requirements Language
-   3.  New RPC Auth Pseudo-Flavors
+   3.  RPC Auth Pseudo-flavors for Transport Layer Security
+     3.1.  Definitions of New Pseudo-flavors
    4.  Channel Binding
      4.1.  TLS Channel Binding
      4.2.  SSHv2 Channel Binding
@@ -131,6 +133,36 @@ Table of Contents
    transports can benefit from the pseudo-flavors defined in this
    document.
 
+1.1.  Terminology
+
+   This document adopts the terminology introduced in Section 3 of
+   [RFC6973] and assumes a working knowledge of the Remote Procedure
+   Call (RPC) version 2 protocol [RFC5531] and the Transport Layer
+   Security (TLS) protocol [RFC8446].
+
+   This document adheres to the convention that a "client" is a network
+   host that actively initiates an association, and a "server" is a
+   network host that passively accepts an association request.
+
+   An "RPC auth flavor" is a set of protocol elements that can identify
+   a peer and a user, and possibly authenticate either or both.  The
+   distinction between RPC auth flavors and pseudo-flavors is discussed
+   in Section 13.4.2 of [RFC5531].
+
+   RPC documentation historically refers to the authentication of a
+   connecting host as "machine authentication" or "host authentication".
+   TLS documentation refers to the same as "peer authentication".  The
+   current document uses only "peer authentication".
+
+   The term "user authentication" in the current document refers
+   specifically to the RPC caller's credential provided in the "cred"
+   and "verf" fields in each RPC Call.
+
+   This document uses the term "insecure RPC auth flavor" (or "insecure
+   flavor" for short) to refer to a class of RPC auth flavors which
+   provide no user or peer authentication.  Two prime examples of an
+   insecure flavor are AUTH_NONE and AUTH_SYS.
+
 2.  Requirements Language
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -139,50 +171,76 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-3.  New RPC Auth Pseudo-Flavors
+3.  RPC Auth Pseudo-flavors for Transport Layer Security
 
-   The distinction between RPC auth flavors and pseudo-flavors is
-   described in Section 13.4.2 of [RFC5531].
+   Section 4 of [I-D.ietf-nfsv4-rpc-tls] introduces a special RPC auth
+   flavor known as AUTH_TLS.  This RPC auth flavor is used only in a
+   NULL procedure that probes the presence of support for RPC-with-TLS,
+   and acts as a STARTTLS barrier.
+
+   This auth flavor does not carry the identity of the peer or a user.
+   RPC clients do not use this RPC auth flavor to authenticate users in
+   RPC Calls for non-NULL RPC procedures.
+
+   Once transport layer security has been established between two RPC
+   peers, an RPC client can use insecure flavors when forming RPC Calls
+   with knowledge that the RPC server is known and trusted, and without
+   concern that the communication can be altered or monitored.
+
+   In some cases an RPC server might want to restrict access to only RPC
+   clients that have authenticated, or only when encryption protects
+   communication.  The pseudo-flavors defined below enable RPC servers
+   to indicate and enforce access restrictions of this type.
+
+3.1.  Definitions of New Pseudo-flavors
+
+   Using the RPC auth flavor registry instantiated in [RFC5531] gives us
+   leeway to introduce a narrow basic set of pseudoflavors in this
+   document and then expand them, via additional documents, as needs
+   arise.
 
    This document specifies several new RPC auth pseudo-flavors that
    servers may advertise to clients and that clients may use in
    individual RPC transactions, as follows:
 
    *  The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the
-      client may use the AUTH_NONE RPC auth flavor in RPC transactions
-      only if both endpoints have mutually authenticated.  Encryption of
-      traffic between these peers is not required.
+      client may present an AUTH_NONE credential and verifier in RPC
+      Calls only if both peers have mutually authenticated.  Encryption
+      of traffic between these peers is not required.
 
    *  The new RPC auth pseudo-flavor AUTH_NONE_ENC indicates that the
-      client may use the AUTH_NONE RPC auth flavor in RPC transactions
-      only if traffic between these peers is encrypted.  Mutual
-      authentication is not required.
+      client may present an AUTH_NONE credential and verifier in RPC
+      Calls only if traffic between these peers is encrypted.  Mutual
+      peer authentication is not required.
 
    *  The new RPC auth pseudo-flavor AUTH_NONE_MPA_ENC indicates that
-      the client may use the AUTH_NONE RPC auth flavor in RPC
-      transactions only if both endpoints have mutually authenticated
-      and traffic between these peers is encrypted.
-
-   *  The new RPC auth pseudo-flavor AUTH_SYS_MPA indicates that the
-      client may use the AUTH_SYS RPC auth flavor in RPC transactions
-      only if both endpoints have mutually authenticated.  Encryption of
-      traffic between these peers is not required.
-
-   *  The new RPC auth pseudo-flavor AUTH_SYS_ENC indicates that the
-      client may use the AUTH_SYS RPC auth flavor in RPC transactions
-      only if traffic between these peers is encrypted.  Mutual
-      authentication is not required.
-
-   *  The new RPC auth pseudo-flavor AUTH_SYS_MPA_ENC indicates that the
-      client may use the AUTH_SYS RPC auth flavor in RPC transactions
-      only if both endpoints have mutually authenticated and traffic
+      the client may present an AUTH_NONE credential and verifier in RPC
+      Calls only if both peers have mutually authenticated and traffic
       between these peers is encrypted.
 
-   If an RPC client sends an RPC transaction using one of these pseudo-
-   flavors and the underlying transport does not provide the required
-   additional security services as indicated above, the RPC server MUST
-   reject the RPC Call and reply with a reply_stat of MSG_DENIED, a
-   reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.
+   *  The new RPC auth pseudo-flavor AUTH_SYS_MPA indicates that the
+      client may present an AUTH_SYS credential and verifier in RPC
+      Calls only if both peers have mutually authenticated.  Encryption
+      of traffic between these peers is not required.
+
+   *  The new RPC auth pseudo-flavor AUTH_SYS_ENC indicates that the
+      client may present an AUTH_SYS credential and verifier in RPC
+      Calls only if traffic between these peers is encrypted.  Mutual
+      peer authentication is not required.
+
+   *  The new RPC auth pseudo-flavor AUTH_SYS_MPA_ENC indicates that the
+      client may present an AUTH_SYS credential and verifier in RPC
+      Calls only if both peers have mutually authenticated and traffic
+      between these peers is encrypted.
+
+   If an RPC client sends an RPC Call using one of these pseudo-flavors
+   and the underlying transport does not provide the required additional
+   security services as indicated above, the RPC server MUST reject the
+   RPC Call and respond with a reply_stat of MSG_DENIED, a reject_stat
+   of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.
+
+   These pseudo-flavors can be used with any network transport service
+   that provides cryptographically secure authentication or encyrption.
 
 4.  Channel Binding
 
@@ -223,9 +281,23 @@ Table of Contents
    serves as authentication for securing pseudo-flavors that require
    mutual peer authentication.
 
-   The RPC-with-TLS specification requires the use of TLS session
-   encryption, so the presence of TLS under an RPC transport is enough
-   to secure pseudo-flavors that require encryption.
+   The RPC-with-TLS specification requires the use of peer
+   authentication and TLS session encryption, so the presence of TLS
+   under an RPC transport is enough to secure pseudo-flavors that
+   require both mutual peer authentication and encryption.
+
+   Moreover, in the particular case of TLS, when a handshake fails, both
+   peers are made aware of the failure reason via the Finished message.
+   The failure reason can then be communicated to the RPC consumer and
+   the local administrator to enable specific corrective action.
+
+   For instance, an RPC server's local security policy might require
+   that the RPC client's IP address or hostname match its certificates
+   Subject Alt Name (SAN).  This is not always possible if the client's
+   IP address and hostname are assigned dynamically.  When such a server
+   causes a handshake failure, the administrators can be made aware that
+   the server's SAN policy restricted access, and corrective action can
+   then be taken.
 
 4.2.  SSHv2 Channel Binding
 
@@ -350,16 +422,33 @@ Table of Contents
 
 7.  Security Considerations
 
-   A discussion of the shortcomings of the AUTH_SYS RPC auth flavor
-   appear in the final paragraph of Appendix A of [RFC5531] and in
+   Discussion of shortcomings peculiar to the AUTH_SYS RPC auth flavor
+   appears in the final paragraph of Appendix A of [RFC5531] and in
    Appendix A of [I-D.ietf-nfsv4-rpc-tls].
 
-   Important security considerations related to the use of channel
+   When implementing or deploying transport layer security to protect an
+   upper-level RPC protocol:
+
+   *  RPC clients that support transport layer security SHOULD use it
+      whenever possible.  Typically the only reason not to is when
+      performance is important and reasonable security can be provided
+      in some other way.
+
+   *  RPC clients that support transport layer security and have the
+      ability to authenticate SHOULD do so.  The only reason not to
+      authenticate is when authentication and encryption can only be
+      enabled together, performance is paramount, and there are other
+      available mechanisms that can provide peer authentication
+      securely.
+
+   The pseudo-flavors defined in this document enable RPC servers to
+   indicate required levels of security so that RPC clients can make
+   informed and autonomous decisions that balance performance and
+   scalability against security needs.
+
+   Important security considerations specific to the use of channel
    binding are discussed throughout [RFC5056] and in Section 10 of
    [RFC5929].
-
-   To be further expanded once the proposed set of IANA requests is
-   finalized.
 
 8.  IANA Considerations
 
@@ -495,6 +584,12 @@ Table of Contents
               Internet Key Exchange (IKE) Document Roadmap", RFC 6071,
               DOI 10.17487/RFC6071, February 2011,
               <https://www.rfc-editor.org/rfc/rfc6071>.
+
+   [RFC6973]  Cooper, A., Tschofenig, H., Aboba, B., Peterson, J.,
+              Morris, J., Hansen, M., and R. Smith, "Privacy
+              Considerations for Internet Protocols", RFC 6973,
+              DOI 10.17487/RFC6973, July 2013,
+              <https://www.rfc-editor.org/rfc/rfc6973>.
 
    [RFC8166]  Lever, C., Ed., Simpson, W., and T. Talpey, "Remote Direct
               Memory Access Transport for Remote Procedure Call Version

@@ -1126,12 +1126,22 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-terminology" class="xref">Terminology</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-requirements-language" class="xref">Requirements Language</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-new-rpc-auth-pseudo-flavors" class="xref">New RPC Auth Pseudo-Flavors</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-rpc-auth-pseudo-flavors-for" class="xref">RPC Auth Pseudo-flavors for Transport Layer Security</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-definitions-of-new-pseudo-f" class="xref">Definitions of New Pseudo-flavors</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-channel-binding" class="xref">Channel Binding</a></p>
@@ -1238,6 +1248,35 @@ other novel RPC transports will eventually appear that also
 provide transport layer security features.
 These transports can benefit from the pseudo-flavors
 defined in this document.<a href="#section-1-8" class="pilcrow">¶</a></p>
+<div id="terminology">
+<section id="section-1.1">
+        <h3 id="name-terminology">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+        </h3>
+<p id="section-1.1-1">This document adopts the terminology introduced in Section 3 of
+<span>[<a href="#RFC6973" class="xref">RFC6973</a>]</span> and assumes a working knowledge of the Remote Procedure
+Call (RPC) version 2 protocol <span>[<a href="#RFC5531" class="xref">RFC5531</a>]</span> and the Transport Layer
+Security (TLS) protocol <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">This document adheres to the convention that a "client" is a network
+host that actively initiates an association, and a "server" is a
+network host that passively accepts an association request.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">An "RPC auth flavor" is a set of protocol elements that can identify
+a peer and a user, and possibly authenticate either or both. The
+distinction between RPC auth flavors and pseudo-flavors is
+discussed in <span><a href="https://rfc-editor.org/rfc/rfc5531#section-13.4.2" class="relref">Section 13.4.2</a> of [<a href="#RFC5531" class="xref">RFC5531</a>]</span>.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+<p id="section-1.1-4">RPC documentation historically refers to the authentication of a
+connecting host as "machine authentication" or "host authentication".
+TLS documentation refers to the same as "peer authentication".
+The current document uses only "peer authentication".<a href="#section-1.1-4" class="pilcrow">¶</a></p>
+<p id="section-1.1-5">The term "user authentication" in the current document refers
+specifically to the RPC caller's credential provided in the "cred"
+and "verf" fields in each RPC Call.<a href="#section-1.1-5" class="pilcrow">¶</a></p>
+<p id="section-1.1-6">This document uses the term "insecure RPC auth flavor"
+(or "insecure flavor" for short) to refer to a class of
+RPC auth flavors which provide no user or peer authentication.
+Two prime examples of an insecure flavor are AUTH_NONE and AUTH_SYS.<a href="#section-1.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="requirements-language">
@@ -1251,53 +1290,81 @@ described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> 
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="new-rpc-auth-pseudo-flavors">
+<div id="rpc-auth-pseudo-flavors-for-transport-layer-security">
 <section id="section-3">
-      <h2 id="name-new-rpc-auth-pseudo-flavors">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-new-rpc-auth-pseudo-flavors" class="section-name selfRef">New RPC Auth Pseudo-Flavors</a>
+      <h2 id="name-rpc-auth-pseudo-flavors-for">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-rpc-auth-pseudo-flavors-for" class="section-name selfRef">RPC Auth Pseudo-flavors for Transport Layer Security</a>
       </h2>
-<p id="section-3-1">The distinction between RPC auth flavors and pseudo-flavors is
-described in <span><a href="https://rfc-editor.org/rfc/rfc5531#section-13.4.2" class="relref">Section 13.4.2</a> of [<a href="#RFC5531" class="xref">RFC5531</a>]</span>.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">This document specifies several new RPC auth pseudo-flavors
+<p id="section-3-1"><span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-nfsv4-rpc-tls-11#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-nfsv4-rpc-tls" class="xref">I-D.ietf-nfsv4-rpc-tls</a>]</span> introduces a special
+RPC auth flavor known as AUTH_TLS. This RPC auth flavor is
+used only in a NULL procedure that probes the presence of
+support for RPC-with-TLS, and acts as a STARTTLS barrier.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">This auth flavor does not carry the identity of the peer
+or a user. RPC clients do not use this RPC auth flavor
+to authenticate users in RPC Calls for non-NULL RPC procedures.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">Once transport layer security has been established between
+two RPC peers, an RPC client can use insecure flavors
+when forming RPC Calls
+with knowledge that the RPC server is known and trusted, and
+without concern that the communication can be altered or monitored.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">In some cases an RPC server might want to restrict access to
+only RPC clients that have authenticated, or only when
+encryption protects communication. The pseudo-flavors defined
+below enable RPC servers to indicate and enforce access
+restrictions of this type.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<div id="definitions-of-new-pseudo-flavors">
+<section id="section-3.1">
+        <h3 id="name-definitions-of-new-pseudo-f">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-definitions-of-new-pseudo-f" class="section-name selfRef">Definitions of New Pseudo-flavors</a>
+        </h3>
+<p id="section-3.1-1">Using the RPC auth flavor registry instantiated in <span>[<a href="#RFC5531" class="xref">RFC5531</a>]</span>
+gives us leeway to introduce a narrow basic set of pseudoflavors
+in this document and then expand them, via additional documents,
+as needs arise.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">This document specifies several new RPC auth pseudo-flavors
 that servers may advertise to clients and that clients may use
-in individual RPC transactions, as follows:<a href="#section-3-2" class="pilcrow">¶</a></p>
+in individual RPC transactions, as follows:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3-3.1">The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the client
-may use the AUTH_NONE RPC auth flavor in RPC transactions only
-if both endpoints have mutually authenticated. Encryption of
-traffic between these peers is not required.<a href="#section-3-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3.1-3.1">The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the client
+may present an AUTH_NONE credential and verifier in RPC Calls only
+if both peers have mutually authenticated. Encryption of
+traffic between these peers is not required.<a href="#section-3.1-3.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-3.2">The new RPC auth pseudo-flavor AUTH_NONE_ENC indicates that the client
-may use the AUTH_NONE RPC auth flavor in RPC transactions only
-if traffic between these peers is encrypted. Mutual authentication
-is not required.<a href="#section-3-3.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-3.2">The new RPC auth pseudo-flavor AUTH_NONE_ENC indicates that the client
+may present an AUTH_NONE credential and verifier in RPC Calls only
+if traffic between these peers is encrypted. Mutual peer authentication
+is not required.<a href="#section-3.1-3.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-3.3">The new RPC auth pseudo-flavor AUTH_NONE_MPA_ENC indicates that the client
-may use the AUTH_NONE RPC auth flavor in RPC transactions only
-if both endpoints have mutually authenticated and traffic between
-these peers is encrypted.<a href="#section-3-3.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-3.3">The new RPC auth pseudo-flavor AUTH_NONE_MPA_ENC indicates that the client
+may present an AUTH_NONE credential and verifier in RPC Calls only
+if both peers have mutually authenticated and traffic between
+these peers is encrypted.<a href="#section-3.1-3.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-3.4">The new RPC auth pseudo-flavor AUTH_SYS_MPA indicates that the client
-may use the AUTH_SYS RPC auth flavor in RPC transactions only
-if both endpoints have mutually authenticated. Encryption of
-traffic between these peers is not required.<a href="#section-3-3.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-3.4">The new RPC auth pseudo-flavor AUTH_SYS_MPA indicates that the client
+may present an AUTH_SYS credential and verifier in RPC Calls only
+if both peers have mutually authenticated. Encryption of
+traffic between these peers is not required.<a href="#section-3.1-3.4" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-3.5">The new RPC auth pseudo-flavor AUTH_SYS_ENC indicates that the client
-may use the AUTH_SYS RPC auth flavor in RPC transactions only
-if traffic between these peers is encrypted. Mutual authentication
-is not required.<a href="#section-3-3.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-3.5">The new RPC auth pseudo-flavor AUTH_SYS_ENC indicates that the client
+may present an AUTH_SYS credential and verifier in RPC Calls only
+if traffic between these peers is encrypted. Mutual peer authentication
+is not required.<a href="#section-3.1-3.5" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-3.6">The new RPC auth pseudo-flavor AUTH_SYS_MPA_ENC indicates that the client
-may use the AUTH_SYS RPC auth flavor in RPC transactions only
-if both endpoints have mutually authenticated and traffic between
-these peers is encrypted.<a href="#section-3-3.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-3.6">The new RPC auth pseudo-flavor AUTH_SYS_MPA_ENC indicates that the client
+may present an AUTH_SYS credential and verifier in RPC Calls only
+if both peers have mutually authenticated and traffic between
+these peers is encrypted.<a href="#section-3.1-3.6" class="pilcrow">¶</a>
 </li>
-      </ul>
-<p id="section-3-4">If an RPC client sends an RPC transaction using one of these pseudo-flavors
+        </ul>
+<p id="section-3.1-4">If an RPC client sends an RPC Call using one of these pseudo-flavors
 and the underlying transport does not provide the required additional
 security services as indicated above, the RPC server <span class="bcp14">MUST</span> reject the RPC
-Call and reply with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
-and an auth_stat of AUTH_TOOWEAK.<a href="#section-3-4" class="pilcrow">¶</a></p>
+Call and respond with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
+and an auth_stat of AUTH_TOOWEAK.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-5">These pseudo-flavors can be used with any network transport service
+that provides cryptographically secure authentication or encyrption.<a href="#section-3.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="channel-binding">
@@ -1344,9 +1411,21 @@ the 'tls-server-end-point' channel binding type
 as defined in <span><a href="https://rfc-editor.org/rfc/rfc5929#section-4" class="relref">Section 4</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span>
 serves as authentication for securing pseudo-flavors that require
 mutual peer authentication.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1-3">The RPC-with-TLS specification requires the use of TLS session encryption,
-so the presence of TLS under an RPC transport is enough to secure
-pseudo-flavors that require encryption.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">The RPC-with-TLS specification requires the use of peer authentication
+and TLS session encryption, so the presence of TLS under an RPC transport
+is enough to secure pseudo-flavors that require both mutual peer
+authentication and encryption.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">Moreover, in the particular case of TLS, when a handshake fails,
+both peers are made aware of the failure reason via the Finished message.
+The failure reason can then be communicated to the RPC consumer and the
+local administrator to enable specific corrective action.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">For instance, an RPC server's local security policy might require that
+the RPC client's IP address or hostname match its certificates Subject
+Alt Name (SAN). This is not always possible if the client's IP address
+and hostname are assigned dynamically. When such a server causes a
+handshake failure, the administrators can be made aware that
+the server's SAN policy restricted access, and corrective action
+can then be taken.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sshv2-channel-binding">
@@ -1510,12 +1589,30 @@ requested by this document.<a href="#section-6-4" class="pilcrow">¶</a></p>
       <h2 id="name-security-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-7-1">A discussion of the shortcomings of the AUTH_SYS RPC auth flavor appear
-in the final paragraph of <span><a href="https://rfc-editor.org/rfc/rfc5531#appendix-A" class="relref">Appendix A</a> of [<a href="#RFC5531" class="xref">RFC5531</a>]</span>
+<p id="section-7-1">Discussion of shortcomings peculiar to the AUTH_SYS RPC auth flavor
+appears in the final paragraph of <span><a href="https://rfc-editor.org/rfc/rfc5531#appendix-A" class="relref">Appendix A</a> of [<a href="#RFC5531" class="xref">RFC5531</a>]</span>
 and in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-nfsv4-rpc-tls-11#appendix-A" class="relref">Appendix A</a> of [<a href="#I-D.ietf-nfsv4-rpc-tls" class="xref">I-D.ietf-nfsv4-rpc-tls</a>]</span>.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<p id="section-7-2">Important security considerations related to the use of channel binding are
-discussed throughout <span>[<a href="#RFC5056" class="xref">RFC5056</a>]</span> and in <span><a href="https://rfc-editor.org/rfc/rfc5929#section-10" class="relref">Section 10</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span>.<a href="#section-7-2" class="pilcrow">¶</a></p>
-<p id="section-7-3">To be further expanded once the proposed set of IANA requests is finalized.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<p id="section-7-2">When implementing or deploying transport layer security to protect
+an upper-level RPC protocol:<a href="#section-7-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7-3.1">RPC clients that support transport layer security <span class="bcp14">SHOULD</span> use it
+whenever possible. Typically the only reason not to is when
+performance is important and reasonable security can be provided
+in some other way.<a href="#section-7-3.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-7-3.2">RPC clients that support transport layer security and have
+the ability to authenticate <span class="bcp14">SHOULD</span> do so. The only reason not to
+authenticate is when authentication and encryption can only be
+enabled together, performance is paramount, and there are other
+available mechanisms that can provide peer authentication securely.<a href="#section-7-3.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-7-4">The pseudo-flavors defined in this document enable RPC servers to indicate
+required levels of security so that RPC clients can make informed and
+autonomous decisions that balance performance and scalability against
+security needs.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<p id="section-7-5">Important security considerations specific to the use of channel binding
+are discussed throughout <span>[<a href="#RFC5056" class="xref">RFC5056</a>]</span> and in <span><a href="https://rfc-editor.org/rfc/rfc5929#section-10" class="relref">Section 10</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span>.<a href="#section-7-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-cons">
@@ -1698,6 +1795,10 @@ All new flavors described in the sections below are pseudo-flavors.<a href="#sec
 <dt id="RFC6071">[RFC6071]</dt>
         <dd>
 <span class="refAuthor">Frankel, S.</span> and <span class="refAuthor">S. Krishnan</span>, <span class="refTitle">"IP Security (IPsec) and Internet Key Exchange (IKE) Document Roadmap"</span>, <span class="seriesInfo">RFC 6071</span>, <span class="seriesInfo">DOI 10.17487/RFC6071</span>, <time datetime="2011-02" class="refDate">February 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6071">https://www.rfc-editor.org/rfc/rfc6071</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6973">[RFC6973]</dt>
+        <dd>
+<span class="refAuthor">Cooper, A.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Aboba, B.</span>, <span class="refAuthor">Peterson, J.</span>, <span class="refAuthor">Morris, J.</span>, <span class="refAuthor">Hansen, M.</span>, and <span class="refAuthor">R. Smith</span>, <span class="refTitle">"Privacy Considerations for Internet Protocols"</span>, <span class="seriesInfo">RFC 6973</span>, <span class="seriesInfo">DOI 10.17487/RFC6973</span>, <time datetime="2013-07" class="refDate">July 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6973">https://www.rfc-editor.org/rfc/rfc6973</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8166">[RFC8166]</dt>
         <dd>
