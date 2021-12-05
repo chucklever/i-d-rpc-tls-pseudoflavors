@@ -156,7 +156,10 @@ as needs arise.
 
 This document specifies several new RPC auth pseudo-flavors
 that servers may advertise to clients and that clients may use
-in individual RPC transactions, as follows:
+in individual RPC transactions.
+These pseudo-flavors can be used with any network transport service
+that provides cryptographically secure authentication or encyrption,
+as follows:
 
 * The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the client
 may present an AUTH_NONE credential and verifier in RPC Calls only
@@ -188,14 +191,24 @@ may present an AUTH_SYS credential and verifier in RPC Calls only
 if both peers have mutually authenticated and traffic between
 these peers is encrypted.
 
+## Server Responses
+
+When an RPC Call using one of these pseudo-flavors arrives
+via a connection-oriented transport, the RPC server MUST respond
+on the same connection using the same level of
+transport security guarantees.
+When an RPC Call arrives via a connectionless transport,
+the RPC server MUST respond using the level of transport security
+layer guarantees that the RPC Call's RPC auth flavor requires.
+If the server does not comply with the
+transport layer security guarantees that the client requested,
+the client MUST drop that RPC Reply without processing it.
+
 If an RPC client sends an RPC Call using one of these pseudo-flavors
 and the underlying transport does not provide the required additional
-security services as indicated above, the RPC server MUST reject the RPC
-Call and respond with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
-and an auth_stat of AUTH_TOOWEAK.
-
-These pseudo-flavors can be used with any network transport service
-that provides cryptographically secure authentication or encyrption.
+security services as indicated above, the RPC server MUST reject
+the RPC Call and respond with a reply_stat of MSG_DENIED,
+a reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.
 
 # Channel Binding
 
