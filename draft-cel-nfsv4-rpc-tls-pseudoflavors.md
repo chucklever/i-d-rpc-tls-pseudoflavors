@@ -26,14 +26,15 @@ normative:
 
 --- abstract
 
-Recent innovations in Remote Procedure Call transport layer security
+Recent innovations in Remote Procedure Call (RPC) transport layer security
 enable broad deployment of encryption and mutual peer authentication
 when exchanging RPC messages.
 These security mechanisms can protect peers who continue to use
-RPC_AUTH_SYS, which is not cryptographically secure, on open networks.
-This document introduces several new RPC auth pseudo-flavors
-that an RPC service can use to indicate TLS-related security
-requirements for accessing that service.
+the AUTH_SYS RPC auth flavor, which is not cryptographically secure,
+on open networks.
+This document introduces several RPC auth pseudo-flavors and
+other mechanisms that an RPC service can use to indicate
+transport layer security requirements for accessing that service.
 
 --- note_Note
 
@@ -53,42 +54,39 @@ Instructions are on that page.
 
 # Introduction
 
-Each ONC RPC transaction may be associated with a user and a set of groups.
+Each RPC transaction may be associated with a user and a set of groups.
 That transaction's RPC auth flavor determines how the user/groups are
 identified and whether they are authenticated.
-
-The peers which host applications and RPC services may also be
+Peers which host applications and RPC services may also be
 identified and authenicated in each RPC transaction,
-again depending on the transaction's RPC auth flavor.
+again depending on the transaction's RPC auth flavor {{!RFC5531}}.
 
 Not all flavors provide peer and user identification and authentication.
 For example, the traditional RPC auth flavor AUTH_NONE identifies no
 user or group and no authentication of users or peers.
-
-The traditional RPC auth flavor AUTH_SYS, as it is defined in {{!RFC5531}},
-provides identification of peers, users, and groups,
-but no authentication of any of these.
+The traditional RPC auth flavor AUTH_SYS provides identification of
+peers, users, and groups, but does not provide authentication of any of these.
 
 Moreover, unlike some GSS security services, these RPC auth flavors
-provide no confidentiality or integrity checking. Therefore AUTH_NONE
-and AUTH_SYS are considered insecure.
+provide no confidentiality or integrity checking services.
+Therefore AUTH_NONE and AUTH_SYS are considered insecure.
 
 Mutual peer authentication and encryption provided at the transport
-layer is known to make the use of AUTH_NONE and AUTH_SYS more secure.
-
+layer can make the use of AUTH_NONE and AUTH_SYS more secure.
 An RPC service might want to indicate to its clients that it will not
-allow access via AUTH_NONE or AUTH_SYS unless such underlying encryption
-or peer authentication services are in place. To do that, this document
-requests the allocation of new RPC auth flavors that upper layers
-such as NFS {{?RFC8881}} can use to enforce stronger security when
+allow access via AUTH_NONE or AUTH_SYS unless transport layer security
+services are in place. To do that, this document specifies
+several RPC auth pseudo-flavors that upper layers such as NFS {{?RFC8881}}
+can use to enforce stronger security when
 unauthenticated RPC auth flavors are in use.
 
 The author expects that,
 in addition to RPC-with-TLS as defined in {{I-D.ietf-nfsv4-rpc-tls}},
-other novel RPC transports will eventually appear that also
-provide transport layer security features.
+other novel RPC transports will eventually appear that
+provide similar transport layer security features.
 These transports can benefit from the pseudo-flavors
-defined in this document.
+defined in this document,
+or this approach can be extended if other features require it.
 
 ## Terminology
 
