@@ -7,14 +7,15 @@
 <title>Pseudo-flavors for Remote Procedure Calls with Transport Layer Security</title>
 <meta content="Charles Lever" name="author">
 <meta content="
-       Recent innovations in Remote Procedure Call transport layer security
+       Recent innovations in Remote Procedure Call (RPC) transport layer security
 enable broad deployment of encryption and mutual peer authentication
 when exchanging RPC messages.
 These security mechanisms can protect peers who continue to use
-RPC_AUTH_SYS, which is not cryptographically secure, on open networks.
-This document introduces several new RPC auth pseudo-flavors
-that an RPC service can use to indicate TLS-related security
-requirements for accessing that service. 
+the AUTH_SYS RPC auth flavor, which is not cryptographically secure,
+on open networks.
+This document introduces several RPC auth pseudo-flavors and
+other mechanisms that an RPC service can use to indicate
+transport layer security requirements for accessing that service. 
     " name="description">
 <meta content="xml2rfc 3.11.1" name="generator">
 <meta content="draft-cel-nfsv4-rpc-tls-pseudoflavors-latest" name="ietf.draft">
@@ -1022,7 +1023,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Lever</td>
-<td class="center">Expires 6 June 2022</td>
+<td class="center">Expires 8 June 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1035,12 +1036,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-cel-nfsv4-rpc-tls-pseudoflavors-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-12-03" class="published">3 December 2021</time>
+<time datetime="2021-12-05" class="published">5 December 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-06-06">6 June 2022</time></dd>
+<dd class="expires"><time datetime="2022-06-08">8 June 2022</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1053,14 +1054,15 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <h1 id="title">Pseudo-flavors for Remote Procedure Calls with Transport Layer Security</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">Recent innovations in Remote Procedure Call transport layer security
+<p id="section-abstract-1">Recent innovations in Remote Procedure Call (RPC) transport layer security
 enable broad deployment of encryption and mutual peer authentication
 when exchanging RPC messages.
 These security mechanisms can protect peers who continue to use
-RPC_AUTH_SYS, which is not cryptographically secure, on open networks.
-This document introduces several new RPC auth pseudo-flavors
-that an RPC service can use to indicate TLS-related security
-requirements for accessing that service.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+the AUTH_SYS RPC auth flavor, which is not cryptographically secure,
+on open networks.
+This document introduces several RPC auth pseudo-flavors and
+other mechanisms that an RPC service can use to indicate
+transport layer security requirements for accessing that service.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note" id="section-note.1">
       <h2 id="name-note">
@@ -1095,7 +1097,7 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 June 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 8 June 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1140,6 +1142,9 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
                 <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-definitions-of-new-pseudo-f" class="xref">Definitions of New Pseudo-flavors</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-server-responses" class="xref">Server Responses</a></p>
 </li>
             </ul>
 </li>
@@ -1219,35 +1224,35 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Each ONC RPC transaction may be associated with a user and a set of groups.
+<p id="section-1-1">Each RPC transaction may be associated with a user and a set of groups.
 That transaction's RPC auth flavor determines how the user/groups are
-identified and whether they are authenticated.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">The peers which host applications and RPC services may also be
+identified and whether they are authenticated.
+Peers which host applications and RPC services may also be
 identified and authenicated in each RPC transaction,
-again depending on the transaction's RPC auth flavor.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">Not all flavors provide peer and user identification and authentication.
+again depending on the transaction's RPC auth flavor <span>[<a href="#RFC5531" class="xref">RFC5531</a>]</span>.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Not all flavors provide peer and user identification and authentication.
 For example, the traditional RPC auth flavor AUTH_NONE identifies no
-user or group and no authentication of users or peers.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">The traditional RPC auth flavor AUTH_SYS, as it is defined in <span>[<a href="#RFC5531" class="xref">RFC5531</a>]</span>,
-provides identification of peers, users, and groups,
-but no authentication of any of these.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">Moreover, unlike some GSS security services, these RPC auth flavors
-provide no confidentiality or integrity checking. Therefore AUTH_NONE
-and AUTH_SYS are considered insecure.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<p id="section-1-6">Mutual peer authentication and encryption provided at the transport
-layer is known to make the use of AUTH_NONE and AUTH_SYS more secure.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">An RPC service might want to indicate to its clients that it will not
-allow access via AUTH_NONE or AUTH_SYS unless such underlying encryption
-or peer authentication services are in place. To do that, this document
-requests the allocation of new RPC auth flavors that upper layers
-such as NFS <span>[<a href="#RFC8881" class="xref">RFC8881</a>]</span> can use to enforce stronger security when
-unauthenticated RPC auth flavors are in use.<a href="#section-1-7" class="pilcrow">¶</a></p>
-<p id="section-1-8">The author expects that,
+user or group and no authentication of users or peers.
+The traditional RPC auth flavor AUTH_SYS provides identification of
+peers, users, and groups, but does not provide authentication of any of these.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">Moreover, unlike some GSS security services, these RPC auth flavors
+provide no confidentiality or integrity checking services.
+Therefore AUTH_NONE and AUTH_SYS are considered insecure.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">Mutual peer authentication and encryption provided at the transport
+layer can make the use of AUTH_NONE and AUTH_SYS more secure.
+An RPC service might want to indicate to its clients that it will not
+allow access via AUTH_NONE or AUTH_SYS unless transport layer security
+services are in place. To do that, this document specifies
+several RPC auth pseudo-flavors that upper layers such as NFS <span>[<a href="#RFC8881" class="xref">RFC8881</a>]</span>
+can use to enforce stronger security when
+unauthenticated RPC auth flavors are in use.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">The author expects that,
 in addition to RPC-with-TLS as defined in <span>[<a href="#I-D.ietf-nfsv4-rpc-tls" class="xref">I-D.ietf-nfsv4-rpc-tls</a>]</span>,
-other novel RPC transports will eventually appear that also
-provide transport layer security features.
+other novel RPC transports will eventually appear that
+provide similar transport layer security features.
 These transports can benefit from the pseudo-flavors
-defined in this document.<a href="#section-1-8" class="pilcrow">¶</a></p>
+defined in this document,
+or this approach can be extended if other features require it.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <div id="terminology">
 <section id="section-1.1">
         <h3 id="name-terminology">
@@ -1323,7 +1328,10 @@ in this document and then expand them, via additional documents,
 as needs arise.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.1-2">This document specifies several new RPC auth pseudo-flavors
 that servers may advertise to clients and that clients may use
-in individual RPC transactions, as follows:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+in individual RPC transactions.
+These pseudo-flavors can be used with any network transport service
+that provides cryptographically secure authentication or encyrption,
+as follows:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-3.1">The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the client
 may present an AUTH_NONE credential and verifier in RPC Calls only
@@ -1356,13 +1364,28 @@ if both peers have mutually authenticated and traffic between
 these peers is encrypted.<a href="#section-3.1-3.6" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-3.1-4">If an RPC client sends an RPC Call using one of these pseudo-flavors
+</section>
+</div>
+<div id="server-responses">
+<section id="section-3.2">
+        <h3 id="name-server-responses">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-server-responses" class="section-name selfRef">Server Responses</a>
+        </h3>
+<p id="section-3.2-1">When an RPC Call using one of these pseudo-flavors arrives
+via a connection-oriented transport, the RPC server <span class="bcp14">MUST</span> respond
+on the same connection using the same level of
+transport security guarantees.
+When an RPC Call arrives via a connectionless transport,
+the RPC server <span class="bcp14">MUST</span> respond using the level of transport security
+layer guarantees that the RPC Call's RPC auth flavor requires.
+If the server does not comply with the
+transport layer security guarantees that the client requested,
+the client <span class="bcp14">MUST</span> drop that RPC Reply without processing it.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">If an RPC client sends an RPC Call using one of these pseudo-flavors
 and the underlying transport does not provide the required additional
-security services as indicated above, the RPC server <span class="bcp14">MUST</span> reject the RPC
-Call and respond with a reply_stat of MSG_DENIED, a reject_stat of AUTH_ERR,
-and an auth_stat of AUTH_TOOWEAK.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
-<p id="section-3.1-5">These pseudo-flavors can be used with any network transport service
-that provides cryptographically secure authentication or encyrption.<a href="#section-3.1-5" class="pilcrow">¶</a></p>
+security services as indicated above, the RPC server <span class="bcp14">MUST</span> reject
+the RPC Call and respond with a reply_stat of MSG_DENIED,
+a reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
