@@ -76,7 +76,7 @@ layer can make the use of AUTH_NONE and AUTH_SYS more secure.
 An RPC service might want to indicate to its clients that it will not
 allow access via AUTH_NONE or AUTH_SYS unless transport layer security
 services are in place. To do that, this document specifies
-several RPC auth pseudo-flavors that upper layers such as NFS {{?RFC8881}}
+several pseudo-flavors that upper layers such as NFS {{?RFC8881}}
 can use to enforce stronger security when
 unauthenticated RPC auth flavors are in use.
 
@@ -144,74 +144,62 @@ when forming RPC Calls
 with knowledge that the RPC server is known and trusted, and
 without concern that the communication can be altered or monitored.
 
-In some cases an RPC server might want to restrict access to
-only RPC clients that have authenticated, or only when
+In some cases an RPC service might want to restrict access to
+only clients that have authenticated, or perhaps only when
 encryption protects communication. The pseudo-flavors defined
-below enable RPC servers to indicate and enforce access
+below enable RPC-based services to indicate and enforce access
 restrictions of this type.
 
 ## Definitions of New Pseudo-flavors
 
+This document specifies several pseudo-flavors that
+servers may advertise to clients via mechanisms not defined here.
 Using the RPC auth flavor registry instantiated in {{RFC5531}}
 gives us leeway to introduce a narrow basic set of pseudoflavors
 in this document and then expand them, via additional documents,
 as needs arise.
 
-This document specifies several new RPC auth pseudo-flavors
-that servers may advertise to clients and that clients may use
-in individual RPC transactions.
-These pseudo-flavors can be used with any network transport service
-that provides cryptographically secure authentication or encyrption,
+RPC clients continue to use AUTH_NONE (0) or AUTH_SYS (1)
+in individual transactions while the network transport service
+provides cryptographically secure authentication or encryption,
 as follows:
 
-* The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the client
-may present an AUTH_NONE credential and verifier in RPC Calls only
-if both peers have mutually authenticated. Encryption of
-traffic between these peers is not required.
+* The new pseudo-flavor AUTH_NONE_MPA indicates that
+the client may use the AUTH_NONE RPC auth flavor only if
+both peers have mutually authenticated.
+Encryption of traffic between these peers is not required.
 
-* The new RPC auth pseudo-flavor AUTH_NONE_ENC indicates that the client
-may present an AUTH_NONE credential and verifier in RPC Calls only
-if traffic between these peers is encrypted. Mutual peer authentication
-is not required.
+* The new pseudo-flavor AUTH_NONE_ENC indicates that
+the client may use the AUTH_NONE RPC auth flavor only if
+traffic between these peers is encrypted.
+Mutual peer authentication is not required.
 
-* The new RPC auth pseudo-flavor AUTH_NONE_MPA_ENC indicates that the client
-may present an AUTH_NONE credential and verifier in RPC Calls only
-if both peers have mutually authenticated and traffic between
-these peers is encrypted.
+* The new pseudo-flavor AUTH_NONE_MPA_ENC indicates that
+the client may use the AUTH_NONE RPC auth flavor only if
+both peers have mutually authenticated and
+traffic between these peers is encrypted.
 
-* The new RPC auth pseudo-flavor AUTH_SYS_MPA indicates that the client
-may present an AUTH_SYS credential and verifier in RPC Calls only
-if both peers have mutually authenticated. Encryption of
-traffic between these peers is not required.
+* The new pseudo-flavor AUTH_SYS_MPA indicates that
+the client may use the AUTH_SYS RPC auth flavor only if
+both peers have mutually authenticated.
+Encryption of traffic between these peers is not required.
 
-* The new RPC auth pseudo-flavor AUTH_SYS_ENC indicates that the client
-may present an AUTH_SYS credential and verifier in RPC Calls only
-if traffic between these peers is encrypted. Mutual peer authentication
-is not required.
+* The new pseudo-flavor AUTH_SYS_ENC indicates that
+the client may use the AUTH_SYS RPC auth flavor only if
+traffic between these peers is encrypted.
+Mutual peer authentication is not required.
 
-* The new RPC auth pseudo-flavor AUTH_SYS_MPA_ENC indicates that the client
-may present an AUTH_SYS credential and verifier in RPC Calls only
-if both peers have mutually authenticated and traffic between
-these peers is encrypted.
+* The new pseudo-flavor AUTH_SYS_MPA_ENC indicates that
+the client may use the AUTH_SYS RPC auth flavor only if
+both peers have mutually authenticated and
+traffic between these peers is encrypted.
 
-## Server Responses
-
-When an RPC Call using one of these pseudo-flavors arrives
-via a connection-oriented transport, the RPC server MUST respond
-on the same connection using the same level of
-transport security guarantees.
-When an RPC Call arrives via a connectionless transport,
-the RPC server MUST respond using the level of transport security
-layer guarantees that the RPC Call's RPC auth flavor requires.
-If the server does not comply with the
-transport layer security guarantees that the client requested,
-the client MUST drop that RPC Reply without processing it.
-
-If an RPC client sends an RPC Call using one of these pseudo-flavors
-and the underlying transport does not provide the required additional
-security services as indicated above, the RPC server MUST reject
-the RPC Call and respond with a reply_stat of MSG_DENIED,
-a reject_stat of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.
+Because the RPC layer is not aware of pseudo-flavors,
+the Upper-Layer Protocol is responsible for ensuring that
+appropriate transport layer security is in place
+when clients use AUTH_SYS or AUTH_NONE. The next section
+explains how server implementations enforce the use of
+transport layer security.
 
 # Channel Binding
 
