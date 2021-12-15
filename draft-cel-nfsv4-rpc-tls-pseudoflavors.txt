@@ -4,8 +4,8 @@
 
 Network File System Version 4                                   C. Lever
 Internet-Draft                                                    Oracle
-Intended status: Standards Track                         5 December 2021
-Expires: 8 June 2022
+Intended status: Standards Track                        15 December 2021
+Expires: 18 June 2022
 
 
 Pseudo-flavors for Remote Procedure Calls with Transport Layer Security
@@ -18,9 +18,10 @@ Abstract
    authentication when exchanging RPC messages.  These security
    mechanisms can protect peers who continue to use the AUTH_SYS RPC
    auth flavor, which is not cryptographically secure, on open networks.
-   This document introduces several RPC auth pseudo-flavors and other
-   mechanisms that an RPC service can use to indicate transport layer
-   security requirements for accessing that service.
+   This document introduces RPC auth pseudo-flavors that an RPC service
+   can use to indicate transport layer security requirements for
+   accessing that service, and a mechanism the service can use to
+   enforce those requirements.
 
 Note
 
@@ -51,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 June 2022.
+   This Internet-Draft will expire on 18 June 2022.
 
 Copyright Notice
 
@@ -74,14 +75,13 @@ Table of Contents
    2.  Requirements Language
    3.  RPC Auth Pseudo-flavors for Transport Layer Security
      3.1.  Definitions of New Pseudo-flavors
-     3.2.  Server Responses
    4.  Channel Binding
      4.1.  TLS Channel Binding
      4.2.  SSHv2 Channel Binding
      4.3.  Channel Binding for RDMA Transports
    5.  NFS Examples
-     5.1.  Network File System version 3
-     5.2.  Network File System version 4
+     5.1.  Network File System Versions 2 and 3
+     5.2.  Network File System Version 4
        5.2.1.  NFSv4 State Protection
    6.  Implementation Status
    7.  Security Considerations
@@ -98,16 +98,16 @@ Table of Contents
 1.  Introduction
 
    Each RPC transaction may be associated with a user and a set of
-   groups.  That transaction's RPC auth flavor determines how the user/
-   groups are identified and whether they are authenticated.  Peers
-   which host applications and RPC services may also be identified and
-   authenicated in each RPC transaction, again depending on the
+   groups.  That transaction's RPC auth flavor determines how the user
+   and groups are identified and whether they are authenticated.  Peers
+   that host applications and RPC services may also be identified and
+   authenicated in each RPC transaction, again depending on that
    transaction's RPC auth flavor [RFC5531].
 
    Not all flavors provide peer and user identification and
    authentication.  For example, the traditional RPC auth flavor
-   AUTH_NONE identifies no user or group and no authentication of users
-   or peers.  The traditional RPC auth flavor AUTH_SYS provides
+   AUTH_NONE identifies no user or group and provides no authentication
+   of users or peers.  The traditional RPC auth flavor AUTH_SYS provides
    identification of peers, users, and groups, but does not provide
    authentication of any of these.
 
@@ -120,15 +120,15 @@ Table of Contents
    service might want to indicate to its clients that it will not allow
    access via AUTH_NONE or AUTH_SYS unless transport layer security
    services are in place.  To do that, this document specifies several
-   RPC auth pseudo-flavors that upper layers such as NFS [RFC8881] can
-   use to enforce stronger security when unauthenticated RPC auth
-   flavors are in use.
+   pseudo-flavors that upper layers such as NFS [RFC8881] can use to
+   enforce stronger security when unauthenticated RPC auth flavors are
+   in use.
 
-   The author expects that, in addition to RPC-with-TLS as defined in
+   The author expects that, in addition to RPC-with-TLS
    [I-D.ietf-nfsv4-rpc-tls], other novel RPC transports will eventually
-   appear that provide similar transport layer security features.  These
-   transports can benefit from the pseudo-flavors defined in this
-   document, or this approach can be extended if other features require
+   appear that provide similar security features.  These transports can
+   benefit from the pseudo-flavors defined in this document, or this
+   approach can be extended if new transport security features require
    it.
 
 1.1.  Terminology
@@ -142,14 +142,19 @@ Table of Contents
    host that actively initiates an association, and a "server" is a
    network host that passively accepts an association request.
 
-   An "RPC auth flavor" is a set of protocol elements that can identify
-   a peer and a user, and possibly authenticate either or both.  The
-   distinction between RPC auth flavors and pseudo-flavors is discussed
-   in Section 13.4.2 of [RFC5531].
+   For the purposes of this document, an Upper-Layer Protocol is an RPC
+   Program and Version tuple comprised of a set of procedure calls
+   defining a single API.  One example of a ULP is the Network File
+   System Version 4.0 [RFC7530].
 
-   RPC documentation historically refers to the authentication of a
-   connecting host as "machine authentication" or "host authentication".
-   TLS documentation refers to the same as "peer authentication".  The
+   An "RPC auth flavor" is a set of protocol elements that can identify
+   a network peer and a user and possibly authenticate either or both.
+   Section 13.4.2 of [RFC5531] explains the differences between RPC auth
+   flavors and pseudo-flavors.
+
+   RPC documentation historically refers to the authentication of a host
+   as "machine authentication" or "host authentication".  TLS
+   documentation refers to the same as "peer authentication".  The
    current document uses only "peer authentication".
 
    The term "user authentication" in the current document refers
@@ -159,7 +164,7 @@ Table of Contents
    This document uses the term "insecure RPC auth flavor" (or "insecure
    flavor" for short) to refer to a class of RPC auth flavors which
    provide no user or peer authentication.  Two prime examples of an
-   insecure flavor are AUTH_NONE and AUTH_SYS.
+   insecure RPC auth flavor are AUTH_NONE and AUTH_SYS.
 
 2.  Requirements Language
 
@@ -185,71 +190,57 @@ Table of Contents
    with knowledge that the RPC server is known and trusted, and without
    concern that the communication can be altered or monitored.
 
-   In some cases an RPC server might want to restrict access to only RPC
-   clients that have authenticated, or only when encryption protects
-   communication.  The pseudo-flavors defined below enable RPC servers
-   to indicate and enforce access restrictions of this type.
+   In some cases an RPC service might want to restrict access to only
+   clients that have authenticated, or perhaps only when encryption
+   protects communication.  The pseudo-flavors defined below enable RPC-
+   based services to indicate and enforce access restrictions of this
+   type.
 
 3.1.  Definitions of New Pseudo-flavors
 
-   Using the RPC auth flavor registry instantiated in [RFC5531] gives us
-   leeway to introduce a narrow basic set of pseudoflavors in this
-   document and then expand them, via additional documents, as needs
-   arise.
+   This document specifies several pseudo-flavors that servers may
+   advertise to clients via mechanisms not defined here.  Using the RPC
+   auth flavor registry instantiated in [RFC5531] gives us leeway to
+   introduce a narrow basic set of pseudoflavors in this document and
+   then expand them, via additional documents, as needs arise.
 
-   This document specifies several new RPC auth pseudo-flavors that
-   servers may advertise to clients and that clients may use in
-   individual RPC transactions.  These pseudo-flavors can be used with
-   any network transport service that provides cryptographically secure
-   authentication or encyrption, as follows:
+   RPC clients continue to use AUTH_NONE (0) or AUTH_SYS (1) in
+   individual transactions while the network transport service provides
+   cryptographically secure authentication or encryption, as follows:
 
-   *  The new RPC auth pseudo-flavor AUTH_NONE_MPA indicates that the
-      client may present an AUTH_NONE credential and verifier in RPC
-      Calls only if both peers have mutually authenticated.  Encryption
-      of traffic between these peers is not required.
+   *  The new pseudo-flavor AUTH_NONE_MPA indicates that the client may
+      use the AUTH_NONE RPC auth flavor only if both peers have mutually
+      authenticated.  Encryption of traffic between these peers is not
+      required.
 
-   *  The new RPC auth pseudo-flavor AUTH_NONE_ENC indicates that the
-      client may present an AUTH_NONE credential and verifier in RPC
-      Calls only if traffic between these peers is encrypted.  Mutual
-      peer authentication is not required.
+   *  The new pseudo-flavor AUTH_NONE_ENC indicates that the client may
+      use the AUTH_NONE RPC auth flavor only if traffic between these
+      peers is encrypted.  Mutual peer authentication is not required.
 
-   *  The new RPC auth pseudo-flavor AUTH_NONE_MPA_ENC indicates that
-      the client may present an AUTH_NONE credential and verifier in RPC
-      Calls only if both peers have mutually authenticated and traffic
-      between these peers is encrypted.
+   *  The new pseudo-flavor AUTH_NONE_MPA_ENC indicates that the client
+      may use the AUTH_NONE RPC auth flavor only if both peers have
+      mutually authenticated and traffic between these peers is
+      encrypted.
 
-   *  The new RPC auth pseudo-flavor AUTH_SYS_MPA indicates that the
-      client may present an AUTH_SYS credential and verifier in RPC
-      Calls only if both peers have mutually authenticated.  Encryption
-      of traffic between these peers is not required.
+   *  The new pseudo-flavor AUTH_SYS_MPA indicates that the client may
+      use the AUTH_SYS RPC auth flavor only if both peers have mutually
+      authenticated.  Encryption of traffic between these peers is not
+      required.
 
-   *  The new RPC auth pseudo-flavor AUTH_SYS_ENC indicates that the
-      client may present an AUTH_SYS credential and verifier in RPC
-      Calls only if traffic between these peers is encrypted.  Mutual
-      peer authentication is not required.
+   *  The new pseudo-flavor AUTH_SYS_ENC indicates that the client may
+      use the AUTH_SYS RPC auth flavor only if traffic between these
+      peers is encrypted.  Mutual peer authentication is not required.
 
-   *  The new RPC auth pseudo-flavor AUTH_SYS_MPA_ENC indicates that the
-      client may present an AUTH_SYS credential and verifier in RPC
-      Calls only if both peers have mutually authenticated and traffic
-      between these peers is encrypted.
+   *  The new pseudo-flavor AUTH_SYS_MPA_ENC indicates that the client
+      may use the AUTH_SYS RPC auth flavor only if both peers have
+      mutually authenticated and traffic between these peers is
+      encrypted.
 
-3.2.  Server Responses
-
-   When an RPC Call using one of these pseudo-flavors arrives via a
-   connection-oriented transport, the RPC server MUST respond on the
-   same connection using the same level of transport security
-   guarantees.  When an RPC Call arrives via a connectionless transport,
-   the RPC server MUST respond using the level of transport security
-   layer guarantees that the RPC Call's RPC auth flavor requires.  If
-   the server does not comply with the transport layer security
-   guarantees that the client requested, the client MUST drop that RPC
-   Reply without processing it.
-
-   If an RPC client sends an RPC Call using one of these pseudo-flavors
-   and the underlying transport does not provide the required additional
-   security services as indicated above, the RPC server MUST reject the
-   RPC Call and respond with a reply_stat of MSG_DENIED, a reject_stat
-   of AUTH_ERR, and an auth_stat of AUTH_TOOWEAK.
+   Because the RPC layer is not aware of pseudo-flavors, the Upper-Layer
+   Protocol is responsible for ensuring that appropriate transport layer
+   security is in place when clients use AUTH_SYS or AUTH_NONE.  The
+   next section explains how server implementations enforce the use of
+   transport layer security.
 
 4.  Channel Binding
 
@@ -260,7 +251,7 @@ Table of Contents
    specification [RFC2743] recognized the use of security provided by
    transport services underlying GSS with the introduction of channel
    binding.  [RFC5056] further describes channel binding as a concept
-   that
+   that...
 
       ...allows applications to establish that the two end-points of a
       secure channel at one network layer are the same as at a higher
@@ -272,18 +263,18 @@ Table of Contents
    We are particularly interested in ensuring that the mutual
    authentication done during a TLS handshake (most recently specified
    in [RFC8446]) on a transport service that handles RPC traffic can be
-   recognized and used by RPC consumers for securely authenticating the
-   communicating RPC peers.
+   recognized and used by Upper-Layer Protocols for securely
+   authenticating the communicating RPC peers.
 
    Section 7 of [RFC5929] identifies a set of API characteristics that
-   RPC and its underlying transport provide to RPC consumers.
+   RPC and its underlying transport provide to such protocols.
 
 4.1.  TLS Channel Binding
 
-   [RFC5929] defines several TLS channel binding types that RPC
-   consumers can use to determine whether appropriate security is
-   available and in place to protect RPC transactions that continue to
-   use insecure RPC auth flavors such as AUTH_SYS.
+   [RFC5929] defines several TLS channel binding types that Upper-Layer
+   Protocol implementations can use to determine whether appropriate
+   security is in place to protect RPC transactions that continue to use
+   insecure RPC auth flavors such as AUTH_SYS.
 
    When used with a Certificate handshake message, the 'tls-server-end-
    point' channel binding type as defined in Section 4 of [RFC5929]
@@ -297,8 +288,8 @@ Table of Contents
 
    Moreover, in the particular case of TLS, when a handshake fails, both
    peers are made aware of the failure reason via the Finished message.
-   The failure reason can then be communicated to the RPC consumer and
-   the local administrator to enable specific corrective action.
+   The failure reason can then be reported to the Upper-Layer Protocol
+   so the local administrator can take specific corrective action.
 
    For instance, an RPC server's local security policy might require
    that the RPC client's IP address or hostname match its certificates
@@ -327,39 +318,48 @@ Table of Contents
 
 5.  NFS Examples
 
-   This document defines new protocol elements that any RPC consumer can
-   employ.  This section presents examples of how a commonly-used RPC
-   consumer, NFS, can make use of these new pseudo-flavors.
+   This section presents examples of how a commonly-used Upper-Layer
+   Protocol (NFS) can make use of these pseudo-flavors.
 
-5.1.  Network File System version 3
+5.1.  Network File System Versions 2 and 3
 
-   NFSv3 clients query which RPC auth flavors a server requires using
-   the MNT procedure, defined in Appendix I of [RFC1813] as part of the
-   MOUNT RPC program.
+   NFSv3 clients use the MNT procedure, defined in Appendix I of
+   [RFC1813], to discover which RPC auth flavors may be used to access a
+   particular shared NFSv3 filesystem.
 
    To require NFSv3 clients to employ underlying transport security when
    using AUTH_NONE or AUTH_SYS, the NFS server includes one or more of
-   the new RPC auth pseudo-flavors defined in Section 8 in the
-   auth_flavors list that is part of a MNT response.
+   the new pseudo-flavors defined in Section 8 in the auth_flavors list
+   that is part of a MNT response.
 
-   For example, an NFSv3 server may list AUTH_SYS_ENC in a MNT response,
-   without also listing AUTH_SYS.
+   When determining whether a filehandle-bearing operation is
+   authorized, an NFSv3 server uses channel binding to ensure that
+   appropriate transport layer security is in place before processing an
+   incoming NFS request that uses an insecure RPC auth flavor.  If that
+   request is not authorized, the NFSv3 server can respond with an
+   nfs_stat of NFS3ERR_STALE.
 
-5.2.  Network File System version 4
+   The usage of the MNT procedure as described in [RFC1094] is the same
+   with the exception that an NFSv2 server responds with NFSERR_STALE
+   instead of NFS3ERR_STALE.
 
-   NFSv4 clients query which RPC auth flavors a server requires using
-   the SECINFO or SECINFO_NO_NAME procedures, as defined in [RFC8881].
+5.2.  Network File System Version 4
+
+   NFSv4 clients use the SECINFO or SECINFO_NO_NAME procedures, as
+   defined in [RFC8881], to discover which RPC auth flavors may be used
+   to access a particular shared NFSv4 filesystem.
 
    To require NFSv4 clients to employ underlying transport security when
    using AUTH_NONE or AUTH_SYS, the NFS server includes one or more of
-   the new RPC auth pseudo-flavors defined in Section 8 in the
-   SECINFO4resok list that is part of a SECINFO or SECINFO_NO_NAME
-   response.
+   the new pseudo-flavors defined in Section 8 in the SECINFO4resok list
+   that is part of a SECINFO or SECINFO_NO_NAME response.
 
-   Once the peers have inspected their endpoint configurations to ensure
-   that any required peer authentication has been done and encryption
-   has been put into place, they can exchange RPC transactions using the
-   traditional AUTH_SYS or AUTH_NONE flavors in each RPC.
+   When determining whether a filehandle-bearing operation is
+   authorized, an NFSv4 server uses channel binding to ensure that
+   appropriate transport layer security is in place before processing an
+   incoming NFSv4 COMPOUND that uses an insecure RPC auth flavor.  If
+   that request is not authorized, the NFSv4 server terminates the
+   COMPOUND with a status code of NFS4ERR_WRONGSEC.
 
 5.2.1.  NFSv4 State Protection
 
@@ -368,19 +368,19 @@ Table of Contents
       |  An alternate approach might place the updates described in this
       |  section in rfc5661bis.
 
-   Section 2.4.3 of [RFC8881] introduces how a server authorizes a
-   client to create a new lease or replace a previous one.  This
-   mechanism prevents clients for maliciously or unintentionally wiping
-   open and lock state for another client.  Section 2.10.8.3 of that
-   document further specifies how the server responds to unauthorized
-   state changes.
+   Section 2.4.3 of [RFC8881] explains how an NFSv4 server determines
+   when an NFSv4 client is authorized to create a new lease or replace a
+   previous one.  This mechanism prevents clients from maliciously or
+   unintentionally wiping open and lock state for another client.
+   Section 2.10.8.3 of that document further specifies how the server
+   responds to unauthorized state changes.
 
    When used with a Certificate handshake message, the 'tls-server-end-
    point' channel binding type as defined in Section 4 of [RFC5929] can
    provide protection similar to SP4_MACH_CRED.
 
-   The text of the first bullet in Section 2.4.3 of [RFC8881] is
-   modified to include AUTH_NONE_MPA_ENC or AUTH_SYS_MPA_ENC, as
+   This document modifies the text of the first bullet in Section 2.4.3
+   of [RFC8881] to include the use of transport layer security as
    follows:
 
    *  The principal that created the client ID for the client owner is
@@ -393,18 +393,37 @@ Table of Contents
          same GSS mechanism and principal MUST be used as that used when
          the client ID was created.  Or,
 
-      -  The principal MUST be based on AUTH_SYS_MPA_ENC, and the server
-         MUST use channel binding to verify the identity of the client
-         peer when performing any of the operations specified in the
+      -  The principal MUST be based on AUTH_SYS, and the server MUST
+         use channel binding to verify the identity of the client peer
+         when performing any of the operations specified in the
          spa_mach_ops bitmaps.  Or,
 
-      -  The principal MUST be based on AUTH_NONE_MPA_ENC, and the
-         server MUST use channel binding to verify the identity of the
-         client peer when performing any of the operations specified in
-         the spa_mach_ops bitmaps.
+      -  The principal MUST be based on AUTH_NONE, and the server MUST
+         use channel binding to verify the identity of the client peer
+         when performing any of the operations specified in the
+         spa_mach_ops bitmaps.
 
    Subsequent discussion of SP4_MACH_CRED in [RFC8881] in Sections
-   2.10.5.1, 2.10.8.3, and 2.10.11.3 would need similar additions.
+   2.10.5.1, 2.10.8.3, and 2.10.11.3 would need similar adjustments.
+
+   Further, NFSv4 server implementations may implement a security policy
+   that restricts the set of clients or security flavors that can
+   perform an EXCHANGE_ID or CREATE_SESSION operation.  However,
+   [RFC8881] does not allow EXCHANGE_ID or CREATE_SESSION to return
+   NFS4ERR_WRONGSEC.
+
+   The spec permits CREATE_SESSION to return NFS4ERR_WRONG_CRED, which
+   means:
+
+      An operation that manipulates state was attempted by a principal
+      that was not allowed to modify that piece of state.
+
+   This document proposes to allow EXCHANGE_ID to return the
+   NFS4ERR_WRONG_CRED status code.  In addition, both CREATE_SESSION and
+   EXCHANGE_ID are allowed to return this status code when the NFSv4
+   server determines via channel binding that the client has sent such
+   procedures using an insecure RPC auth flavor while appropriate
+   transport layer security is not in place.
 
 6.  Implementation Status
 
@@ -566,6 +585,10 @@ Table of Contents
 
 9.2.  Informative References
 
+   [RFC1094]  Nowicki, B., "NFS: Network File System Protocol
+              specification", RFC 1094, DOI 10.17487/RFC1094, March
+              1989, <https://www.rfc-editor.org/rfc/rfc1094>.
+
    [RFC1813]  Callaghan, B., Pawlowski, B., and P. Staubach, "NFS
               Version 3 Protocol Specification", RFC 1813,
               DOI 10.17487/RFC1813, June 1995,
@@ -599,6 +622,10 @@ Table of Contents
               Considerations for Internet Protocols", RFC 6973,
               DOI 10.17487/RFC6973, July 2013,
               <https://www.rfc-editor.org/rfc/rfc6973>.
+
+   [RFC7530]  Haynes, T., Ed. and D. Noveck, Ed., "Network File System
+              (NFS) Version 4 Protocol", RFC 7530, DOI 10.17487/RFC7530,
+              March 2015, <https://www.rfc-editor.org/rfc/rfc7530>.
 
    [RFC8166]  Lever, C., Ed., Simpson, W., and T. Talpey, "Remote Direct
               Memory Access Transport for Remote Procedure Call Version
