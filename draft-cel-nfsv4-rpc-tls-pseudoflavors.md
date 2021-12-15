@@ -99,9 +99,14 @@ This document adheres to the convention that a "client" is a network
 host that actively initiates an association, and a "server" is a
 network host that passively accepts an association request.
 
+For the purposes of this document, an Upper-Layer Protocol is an
+RPC Program and Version tuple comprised of a set of procedure
+calls defining a single API. One example of a ULP is the
+Network File System Version 4.0 {{?RFC7530}}.
+
 An "RPC auth flavor" is a set of protocol elements that can identify
-a peer and a user, and possibly authenticate either or both. The
-distinction between RPC auth flavors and pseudo-flavors is
+a network peer and a user, and possibly authenticate either or both.
+The distinction between RPC auth flavors and pseudo-flavors is
 discussed in {{Section 13.4.2 of RFC5531}}.
 
 RPC documentation historically refers to the authentication of a
@@ -229,18 +234,18 @@ as a concept that
 We are particularly interested in ensuring that the mutual authentication
 done during a TLS handshake (most recently specified in {{?RFC8446}})
 on a transport service that handles RPC traffic
-can be recognized and used by RPC consumers for securely authenticating
-the communicating RPC peers.
+can be recognized and used by Upper-Layer Protocols
+for securely authenticating the communicating RPC peers.
 
 {{Section 7 of RFC5929}} identifies a set of API characteristics that
-RPC and its underlying transport provide to RPC consumers.
+RPC and its underlying transport provide to such protocols.
 
 ## TLS Channel Binding
 
-{{!RFC5929}} defines several TLS channel binding types that RPC consumers
-can use to determine whether appropriate security is available and in place
-to protect RPC transactions that continue to use insecure RPC auth flavors
-such as AUTH_SYS.
+{{!RFC5929}} defines several TLS channel binding types that Upper-Layer
+Protocol implementations can use to determine
+whether appropriate security is in place to protect RPC transactions
+that continue to use insecure RPC auth flavors such as AUTH_SYS.
 
 When used with a Certificate handshake message,
 the 'tls-server-end-point' channel binding type
@@ -255,8 +260,8 @@ authentication and encryption.
 
 Moreover, in the particular case of TLS, when a handshake fails,
 both peers are made aware of the failure reason via the Finished message.
-The failure reason can then be communicated to the RPC consumer and the
-local administrator to enable specific corrective action.
+The failure reason can then be reported to the Upper-Layer Protocol
+so the local administrator can take specific corrective action.
 
 For instance, an RPC server's local security policy might require that
 the RPC client's IP address or hostname match its certificates Subject
@@ -290,9 +295,8 @@ Encapsulating Security Payload (ESP) {{?RFC4303}}.
 
 # NFS Examples
 
-This document defines new protocol elements that any RPC consumer can employ.
-This section presents examples of how a commonly-used RPC consumer, NFS,
-can make use of these new pseudo-flavors.
+This section presents examples of how a commonly-used
+Upper-Layer Protocol (NFS) can make use of these pseudo-flavors.
 
 ## Network File System version 3
 
