@@ -286,20 +286,27 @@ Encapsulating Security Payload (ESP) {{?RFC4303}}.
 This section presents examples of how a commonly-used
 Upper-Layer Protocol (NFS) can make use of these pseudo-flavors.
 
-## Network File System version 3
+## Network File System Versions 2 and 3
 
-NFSv3 clients query which RPC auth flavors a server requires
-using the MNT procedure, defined in {{Appendix I of ?RFC1813}}
-as part of the MOUNT RPC program.
+NFSv3 clients use the MNT procedure, defined in {{Appendix I of ?RFC1813}},
+to discover which RPC auth flavors may be used to access a particular
+shared NFSv3 filesystem.
 
 To require NFSv3 clients to employ underlying transport security
 when using AUTH_NONE or AUTH_SYS, the NFS server includes one or
-more of the new RPC auth pseudo-flavors defined in {{iana-cons}}
+more of the new pseudo-flavors defined in {{iana-cons}}
 in the auth_flavors list that is part of a MNT response.
 
+When determining whether a filehandle-bearing operation is authorized,
+an NFSv3 server uses channel binding to ensure that appropriate
+transport layer security is in place before processing
+an incoming NFS request that uses an insecure RPC auth flavor.
+If that request is not authorized, the NFSv3 server can respond
+with an nfs_stat of NFS3ERR_STALE.
 
-For example, an NFSv3 server may list AUTH_SYS_ENC in a MNT response,
-without also listing AUTH_SYS.
+The usage of the MNT procedure as described in {{?RFC1094}}
+is the same with the exception that an NFSv2 server responds
+with NFSERR_STALE instead of NFS3ERR_STALE.
 
 ## Network File System version 4
 
