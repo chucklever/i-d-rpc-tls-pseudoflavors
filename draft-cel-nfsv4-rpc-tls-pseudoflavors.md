@@ -308,23 +308,24 @@ The usage of the MNT procedure as described in {{?RFC1094}}
 is the same with the exception that an NFSv2 server responds
 with NFSERR_STALE instead of NFS3ERR_STALE.
 
-## Network File System version 4
+## Network File System Version 4
 
-NFSv4 clients query which RPC auth flavors a server requires
-using the SECINFO or SECINFO_NO_NAME procedures,
-as defined in {{?RFC8881}}.
+NFSv4 clients use the SECINFO or SECINFO_NO_NAME procedures,
+as defined in {{?RFC8881}}, to discover which RPC auth flavors
+may be used to access a particular shared NFSv4 filesystem.
 
 To require NFSv4 clients to employ underlying transport security
 when using AUTH_NONE or AUTH_SYS, the NFS server includes one or
-more of the new RPC auth pseudo-flavors defined in {{iana-cons}}
+more of the new pseudo-flavors defined in {{iana-cons}}
 in the SECINFO4resok list that is part of a SECINFO or
 SECINFO_NO_NAME response.
 
-Once the peers have inspected their endpoint configurations to
-ensure that any required peer authentication has been done and
-encryption has been put into place, they can exchange RPC
-transactions using the traditional AUTH_SYS or AUTH_NONE flavors
-in each RPC.
+When determining whether a filehandle-bearing operation is authorized,
+an NFSv4 server uses channel binding to ensure that appropriate
+transport layer security is in place before processing
+an incoming NFSv4 COMPOUND that uses an insecure RPC auth flavor.
+If that request is not authorized, the NFSv4 server terminates
+the COMPOUND with a status code of NFS4ERR_WRONGSEC.
 
 ### NFSv4 State Protection
 
