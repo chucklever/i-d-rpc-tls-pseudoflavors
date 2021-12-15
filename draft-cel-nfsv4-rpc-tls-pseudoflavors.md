@@ -32,9 +32,10 @@ when exchanging RPC messages.
 These security mechanisms can protect peers who continue to use
 the AUTH_SYS RPC auth flavor, which is not cryptographically secure,
 on open networks.
-This document introduces several RPC auth pseudo-flavors and
-other mechanisms that an RPC service can use to indicate
-transport layer security requirements for accessing that service.
+This document introduces RPC auth pseudo-flavors
+that an RPC service can use to indicate
+transport layer security requirements for accessing that service,
+and a mechanism the service can use to enforce those requirements.
 
 --- note_Note
 
@@ -55,15 +56,15 @@ Instructions are on that page.
 # Introduction
 
 Each RPC transaction may be associated with a user and a set of groups.
-That transaction's RPC auth flavor determines how the user/groups are
+That transaction's RPC auth flavor determines how the user and groups are
 identified and whether they are authenticated.
-Peers which host applications and RPC services may also be
+Peers that host applications and RPC services may also be
 identified and authenicated in each RPC transaction,
-again depending on the transaction's RPC auth flavor {{!RFC5531}}.
+again depending on that transaction's RPC auth flavor {{!RFC5531}}.
 
 Not all flavors provide peer and user identification and authentication.
 For example, the traditional RPC auth flavor AUTH_NONE identifies no
-user or group and no authentication of users or peers.
+user or group and provides no authentication of users or peers.
 The traditional RPC auth flavor AUTH_SYS provides identification of
 peers, users, and groups, but does not provide authentication of any of these.
 
@@ -81,12 +82,12 @@ can use to enforce stronger security when
 unauthenticated RPC auth flavors are in use.
 
 The author expects that,
-in addition to RPC-with-TLS as defined in {{I-D.ietf-nfsv4-rpc-tls}},
+in addition to RPC-with-TLS {{I-D.ietf-nfsv4-rpc-tls}},
 other novel RPC transports will eventually appear that
-provide similar transport layer security features.
+provide similar security features.
 These transports can benefit from the pseudo-flavors
-defined in this document,
-or this approach can be extended if other features require it.
+defined in this document, or this approach can be extended if
+new transport security features require it.
 
 ## Terminology
 
@@ -105,12 +106,12 @@ calls defining a single API. One example of a ULP is the
 Network File System Version 4.0 {{?RFC7530}}.
 
 An "RPC auth flavor" is a set of protocol elements that can identify
-a network peer and a user, and possibly authenticate either or both.
-The distinction between RPC auth flavors and pseudo-flavors is
-discussed in {{Section 13.4.2 of RFC5531}}.
+a network peer and a user and possibly authenticate either or both.
+{{Section 13.4.2 of RFC5531}} explains the differences between
+RPC auth flavors and pseudo-flavors.
 
 RPC documentation historically refers to the authentication of a
-connecting host as "machine authentication" or "host authentication".
+host as "machine authentication" or "host authentication".
 TLS documentation refers to the same as "peer authentication".
 The current document uses only "peer authentication".
 
@@ -121,7 +122,8 @@ and "verf" fields in each RPC Call.
 This document uses the term "insecure RPC auth flavor"
 (or "insecure flavor" for short) to refer to a class of
 RPC auth flavors which provide no user or peer authentication.
-Two prime examples of an insecure flavor are AUTH_NONE and AUTH_SYS.
+Two prime examples of an insecure RPC auth flavor are
+AUTH_NONE and AUTH_SYS.
 
 # Requirements Language
 
@@ -210,7 +212,7 @@ The Generic Security Service Application Program Interface (GSS-API)
 specification {{?RFC2743}} recognized the use of security provided
 by transport services underlying GSS with the introduction of
 channel binding. {{?RFC5056}} further describes channel binding
-as a concept that
+as a concept that...
 
 > ...allows applications to establish that
 > the two end-points of a secure channel at one network layer are the
@@ -373,7 +375,7 @@ transport layer security as follows:
 
 Subsequent discussion of SP4_MACH_CRED in {{RFC8881}} in
 Sections 2.10.5.1, 2.10.8.3, and 2.10.11.3 would need similar
-additions.
+adjustments.
 
 Further, NFSv4 server implementations may implement a security policy
 that restricts the set of clients or security flavors that can perform
