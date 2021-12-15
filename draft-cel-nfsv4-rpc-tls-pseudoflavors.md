@@ -375,6 +375,26 @@ Subsequent discussion of SP4_MACH_CRED in {{RFC8881}} in
 Sections 2.10.5.1, 2.10.8.3, and 2.10.11.3 would need similar
 additions.
 
+Further, NFSv4 server implementations may implement a security policy
+that restricts the set of clients or security flavors that can perform
+an EXCHANGE_ID or CREATE_SESSION operation.
+However, {{RFC8881}} does not allow EXCHANGE_ID or CREATE_SESSION
+to return NFS4ERR_WRONGSEC.
+
+The spec permits CREATE_SESSION to return NFS4ERR_WRONG_CRED,
+which means:
+
+> An operation that manipulates state was attempted by a principal
+> that was not allowed to modify that piece of state.
+
+This document proposes to allow EXCHANGE_ID to return the
+NFS4ERR_WRONG_CRED status code. In addition, both CREATE_SESSION
+and EXCHANGE_ID are allowed to return this status code
+when the NFSv4 server determines via channel binding that
+the client has sent such procedures
+using an insecure RPC auth flavor
+while appropriate transport layer security is not in place.
+
 # Implementation Status
 
 {:aside}
