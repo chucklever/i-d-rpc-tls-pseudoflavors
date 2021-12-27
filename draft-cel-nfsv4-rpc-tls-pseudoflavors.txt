@@ -4,8 +4,8 @@
 
 Network File System Version 4                                   C. Lever
 Internet-Draft                                                    Oracle
-Intended status: Standards Track                        15 December 2021
-Expires: 18 June 2022
+Intended status: Standards Track                        27 December 2021
+Expires: 30 June 2022
 
 
 Pseudo-flavors for Remote Procedure Calls with Transport Layer Security
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 June 2022.
+   This Internet-Draft will expire on 30 June 2022.
 
 Copyright Notice
 
@@ -281,10 +281,12 @@ Table of Contents
    serves as authentication for securing pseudo-flavors that require
    mutual peer authentication.
 
-   The RPC-with-TLS specification requires the use of peer
-   authentication and TLS session encryption, so the presence of TLS
-   under an RPC transport is enough to secure pseudo-flavors that
-   require both mutual peer authentication and encryption.
+   RPC-with-TLS requires the use of TLS session encryption
+   [I-D.ietf-nfsv4-rpc-tls].  The presence of TLS under an RPC transport
+   is enough to secure pseudo-flavors that require encryption.  A peer
+   can use channel binding to determine whether peer authentication has
+   also occurred and whether that authentication was mutual or server-
+   only.
 
    Moreover, in the particular case of TLS, when a handshake fails, both
    peers are made aware of the failure reason via the Finished message.
@@ -295,9 +297,9 @@ Table of Contents
    that the RPC client's IP address or hostname match its certificates
    Subject Alt Name (SAN).  This is not always possible if the client's
    IP address and hostname are assigned dynamically.  When such a server
-   causes a handshake failure, the administrators can be made aware that
-   the server's SAN policy restricted access, and corrective action can
-   then be taken.
+   causes a handshake failure, administrators can be made aware that the
+   server's SAN policy restricted a client's access, and corrective
+   action can then be taken.
 
 4.2.  SSHv2 Channel Binding
 
@@ -408,22 +410,19 @@ Table of Contents
 
    Further, NFSv4 server implementations may implement a security policy
    that restricts the set of clients or security flavors that can
-   perform an EXCHANGE_ID or CREATE_SESSION operation.  However,
-   [RFC8881] does not allow EXCHANGE_ID or CREATE_SESSION to return
+   establish a lease via SETCLIENTID or EXCHANGE_ID.  However, [RFC8881]
+   does not allow EXCHANGE_ID or CREATE_SESSION to return
+   NFS4ERR_WRONGSEC, and [RFC7530] does not allow SETCLIENTID to return
    NFS4ERR_WRONGSEC.
 
-   The spec permits CREATE_SESSION to return NFS4ERR_WRONG_CRED, which
-   means:
+   NFSv4.1-based protocols might be updated to allow EXCHANGE_ID or
+   CREATE_SESSION to return NFS4ERR_WRONG_CRED.  However, that solution
+   would be challenging for NFSv4.0, which does not have a definition
+   for NFS4ERR_WRONG_CRED.
 
-      An operation that manipulates state was attempted by a principal
-      that was not allowed to modify that piece of state.
-
-   This document proposes to allow EXCHANGE_ID to return the
-   NFS4ERR_WRONG_CRED status code.  In addition, both CREATE_SESSION and
-   EXCHANGE_ID are allowed to return this status code when the NFSv4
-   server determines via channel binding that the client has sent such
-   procedures using an insecure RPC auth flavor while appropriate
-   transport layer security is not in place.
+      |  More discussion is necessary to determine the exact mechanism
+      |  to handle this case in both protocols and to determine which
+      |  documents need to specify that mechanism.
 
 6.  Implementation Status
 

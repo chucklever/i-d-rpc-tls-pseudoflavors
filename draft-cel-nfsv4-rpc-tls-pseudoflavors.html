@@ -18,10 +18,10 @@ that an RPC service can use to indicate
 transport layer security requirements for accessing that service,
 and a mechanism the service can use to enforce those requirements. 
     " name="description">
-<meta content="xml2rfc 3.11.1" name="generator">
+<meta content="xml2rfc 3.12.0" name="generator">
 <meta content="draft-cel-nfsv4-rpc-tls-pseudoflavors-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.11.1
+  xml2rfc 3.12.0
     Python 3.9.7
     appdirs 1.4.4
     ConfigArgParse 1.3
@@ -30,7 +30,7 @@ and a mechanism the service can use to enforce those requirements.
     intervaltree 3.1.0
     Jinja2 2.11.3
     kitchen 1.2.6
-    lxml 4.6.4
+    lxml 4.6.5
     pycountry 20.7.3
     pyflakes 2.3.1
     PyYAML 5.4.1
@@ -1024,7 +1024,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Lever</td>
-<td class="center">Expires 18 June 2022</td>
+<td class="center">Expires 30 June 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1037,12 +1037,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-cel-nfsv4-rpc-tls-pseudoflavors-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-12-15" class="published">15 December 2021</time>
+<time datetime="2021-12-27" class="published">27 December 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-06-18">18 June 2022</time></dd>
+<dd class="expires"><time datetime="2022-06-30">30 June 2022</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1099,7 +1099,7 @@ Instructions are on that page.<a href="#section-note.1-3" class="pilcrow">¶</a>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 June 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 30 June 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1422,10 +1422,14 @@ the 'tls-server-end-point' channel binding type
 as defined in <span><a href="https://rfc-editor.org/rfc/rfc5929#section-4" class="relref">Section 4</a> of [<a href="#RFC5929" class="xref">RFC5929</a>]</span>
 serves as authentication for securing pseudo-flavors that require
 mutual peer authentication.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1-3">The RPC-with-TLS specification requires the use of peer authentication
-and TLS session encryption, so the presence of TLS under an RPC transport
-is enough to secure pseudo-flavors that require both mutual peer
-authentication and encryption.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">RPC-with-TLS requires the use of TLS session encryption
+<span>[<a href="#I-D.ietf-nfsv4-rpc-tls" class="xref">I-D.ietf-nfsv4-rpc-tls</a>]</span>.
+The presence of TLS under an RPC transport is enough to secure
+pseudo-flavors that require encryption.
+A peer can use channel binding to determine
+whether peer authentication has also occurred
+and
+whether that authentication was mutual or server-only.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
 <p id="section-4.1-4">Moreover, in the particular case of TLS, when a handshake fails,
 both peers are made aware of the failure reason via the Finished message.
 The failure reason can then be reported to the Upper-Layer Protocol
@@ -1434,9 +1438,9 @@ so the local administrator can take specific corrective action.<a href="#section
 the RPC client's IP address or hostname match its certificates Subject
 Alt Name (SAN). This is not always possible if the client's IP address
 and hostname are assigned dynamically. When such a server causes a
-handshake failure, the administrators can be made aware that
-the server's SAN policy restricted access, and corrective action
-can then be taken.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+handshake failure, administrators can be made aware that
+the server's SAN policy restricted a client's access,
+and corrective action can then be taken.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sshv2-channel-binding">
@@ -1572,25 +1576,20 @@ specified in the spa_mach_ops bitmaps.<a href="#section-5.2.1-6.1.2.3" class="pi
 Sections 2.10.5.1, 2.10.8.3, and 2.10.11.3 would need similar
 adjustments.<a href="#section-5.2.1-7" class="pilcrow">¶</a></p>
 <p id="section-5.2.1-8">Further, NFSv4 server implementations may implement a security policy
-that restricts the set of clients or security flavors that can perform
-an EXCHANGE_ID or CREATE_SESSION operation.
+that restricts the set of clients or security flavors that can
+establish a lease via SETCLIENTID or EXCHANGE_ID.
 However, <span>[<a href="#RFC8881" class="xref">RFC8881</a>]</span> does not allow EXCHANGE_ID or CREATE_SESSION
-to return NFS4ERR_WRONGSEC.<a href="#section-5.2.1-8" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-9">The spec permits CREATE_SESSION to return NFS4ERR_WRONG_CRED,
-which means:<a href="#section-5.2.1-9" class="pilcrow">¶</a></p>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-5.2.1-10.1">
-              <p id="section-5.2.1-10.1.1">An operation that manipulates state was attempted by a principal
-that was not allowed to modify that piece of state.<a href="#section-5.2.1-10.1.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-5.2.1-11">This document proposes to allow EXCHANGE_ID to return the
-NFS4ERR_WRONG_CRED status code. In addition, both CREATE_SESSION
-and EXCHANGE_ID are allowed to return this status code
-when the NFSv4 server determines via channel binding that
-the client has sent such procedures
-using an insecure RPC auth flavor
-while appropriate transport layer security is not in place.<a href="#section-5.2.1-11" class="pilcrow">¶</a></p>
+to return NFS4ERR_WRONGSEC, and <span>[<a href="#RFC7530" class="xref">RFC7530</a>]</span> does not allow
+SETCLIENTID to return NFS4ERR_WRONGSEC.<a href="#section-5.2.1-8" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-9">NFSv4.1-based protocols might be updated to allow EXCHANGE_ID
+or CREATE_SESSION to return NFS4ERR_WRONG_CRED. However, that
+solution would be challenging for NFSv4.0, which does not
+have a definition for NFS4ERR_WRONG_CRED.<a href="#section-5.2.1-9" class="pilcrow">¶</a></p>
+<aside id="section-5.2.1-10">
+            <p id="section-5.2.1-10.1">More discussion is necessary to determine the exact mechanism
+to handle this case in both protocols and to determine which
+documents need to specify that mechanism.<a href="#section-5.2.1-10.1" class="pilcrow">¶</a></p>
+</aside>
 </section>
 </div>
 </section>
